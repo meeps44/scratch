@@ -4,5 +4,6 @@ gcc -c ext.c
 ar cr libext.a ext.o
 
 Compile app:
-gcc main.c -lext -o main.out -I include -L lib
+cd ~/dev/scratch/src
+gcc main.c -I ../include -L ../lib -lext -lssl -lcrypto -o main.out 
 
