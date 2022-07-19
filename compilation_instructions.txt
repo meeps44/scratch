@@ -4,5 +4,5 @@ gcc -c ext.c
 ar cr libext.a ext.o
 
 Compile app:
-gcc main.c -lext - main -I include -L lib
+gcc main.c -lext -o main.out -I include -L lib
 
