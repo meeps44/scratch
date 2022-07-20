@@ -181,4 +181,24 @@ int appendAddress(address *a, traceroute *t, uint8_t hopnumber, uint32_t returne
  */
 char *addressToString(address *a);
 
+/**
+ * @brief Loads a .pt-file into memory, converts its content into an
+ * array of Traceroute-objects and prints the output to STDOUT
+ * in JSON-format.
+ * (may be reduntant?)
+ * 
+ * @param filename 
+ * @return int 
+ */
+int ptFileToJson(char *filename);
+
+/**
+ * @brief Loads a .pt-file into memory and converts its content into an
+ * array of Traceroute-objects.
+ * 
+ * @param filename 
+ * @return int 0 on success, -1 on error
+ */
+int ptFileToTraceroute(char *filename);
+
 #endif
