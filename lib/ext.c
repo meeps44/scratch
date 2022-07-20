@@ -192,7 +192,7 @@ struct tm *getCurrentTime()
     return now;
 }
 
-int appendAddress(address *a, traceroute *t, int hopnumber, int returned_flowlabel)
+int appendAddress(address *a, traceroute *t, uint8_t hopnumber, uint32_t returned_flowlabel)
 {
     traceroute *tmp = t;
     int i;

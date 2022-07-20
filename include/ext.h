@@ -153,7 +153,7 @@ int appendHop(hop *h, traceroute *t);
  * @return int Returns -1 if the array is full, 0 if executed correctly with no
  * errors.
  */
-int appendAddress(address *a, traceroute *t, int hopnumber, int returned_flowlabel);
+int appendAddress(address *a, traceroute *t, uint8_t hopnumber, uint32_t returned_flowlabel);
 
 /**
  * @brief Converts an IPv6 address object to a C-string (null-terminated
