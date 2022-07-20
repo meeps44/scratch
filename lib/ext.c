@@ -106,7 +106,7 @@ int asnLookup(address *ipv6_address)
 // 
 /**
  * @brief Loads a traceroute object into memory, parses it and prints out
- * its information
+ * its content.
  * 
  * @param fileName 
  */
@@ -165,10 +165,44 @@ int fWriteTraceroute(traceroute *t, char *filename)
     fclose(f);
 }
 
-int printTraceroute(traceroute *t)
+int printHop(hop *h)
 {
     return 0;
 }
+
+int printAddress(address *a)
+{
+    return 0;
+}
+
+int printTraceroute(traceroute *t)
+{
+    /*
+    uint16_t outgoing_tcp_port;
+    char *timestamp;
+    address source_ip;
+    uint32_t source_asn;
+    address destination_ip;
+    uint32_t destination_asn;
+    uint8_t path_id[SHA_DIGEST_LENGTH];
+    hop *hops[35]; // maximum hop length is 35. any hops longer than that do not get included.
+    */
+    printf("Outgoing tcp port:\t%d\n", t->outgoing_tcp_port);
+    printf("Timestamp:\t%d\n", t->outgoing_tcp_port);
+    printAddress(t->source_ip);
+    printf("Source ASN:\t%d\n", t->source_asn);
+    printAddress(t->destination_ip);
+    printf("Destination ASN:\t%d\n", t->destination_asn);
+    printf("Path ID:\t%x\n", t->path_id);
+    for (int i = 0; i < t->hop_count)
+    {
+        printHop(t->hops[i]);
+    }
+
+    return 0;
+}
+
+
 
 char *tracerouteToJSON(traceroute *t)
 {

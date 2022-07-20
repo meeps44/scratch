@@ -35,6 +35,7 @@ typedef struct traceroute
     address destination_ip;
     uint32_t destination_asn;
     uint8_t path_id[SHA_DIGEST_LENGTH];
+    uint8_t hop_count;
     hop *hops[35]; // maximum hop length is 35. any hops longer than that do not get included.
     // Could also be a list of *hop-pointers
 
@@ -117,6 +118,22 @@ int fWriteTraceroute(traceroute *t, char *filename);
  * @param t
  */
 int printTraceroute(traceroute *t);
+
+/**
+ * @brief Prints each individual field of an address object to STDOUT
+ * 
+ * @param a 
+ * @return int 
+ */
+int printAddress(address *a);
+
+/**
+ * @brief Prints each individual field of a hop object to STDOUT
+ * 
+ * @param h 
+ * @return int 
+ */
+int printHop(hop *h);
 
 /**
  * @brief Convert a traceroute object to JSON.

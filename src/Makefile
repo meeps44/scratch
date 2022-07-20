@@ -9,7 +9,7 @@ ODIR=obj
 LDIR =../lib
 LIBS=libext.a -lssl -lcrypto
 
-# Function patsubst:
+# Function patsubst (pattern substition):
 # Finds whitespace-separated words in TEXT that match PATTERN and replaces them
 # with REPLACEMENT. Here PATTERN may contain a % which acts as a wildcard, 
 # matching any number of any characters within a word.
