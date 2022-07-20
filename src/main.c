@@ -8,6 +8,7 @@ int main(void)
 {
     char *filename = "test.txt";
     traceroute *t;
+    int result;
 
     if(first_run)
     {
@@ -33,7 +34,11 @@ int main(void)
         }
     }
 
-    fWriteTraceroute(t, filename);
+    if ((result = fWriteTraceroute(t, filename)) == -1)
+    {
+        perror("Failed to write traceroute to file.\n");
+        exit(1);
+    }
 
     return EXIT_SUCCESS;
 }

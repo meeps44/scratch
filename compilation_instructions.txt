@@ -1,6 +1,6 @@
 Create library:
 cd lib
-gcc -c ext.c
+gcc -c ext.c -I ../include
 ar cr libext.a ext.o
 
 Compile app:
