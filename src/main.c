@@ -6,6 +6,7 @@ int first_run = 1;
 
 int main(void)
 {
+    char *filename = "test.txt";
     traceroute *t;
 
     if(first_run)
@@ -31,6 +32,8 @@ int main(void)
             fprintf(stderr, "Failed to append hop: Hop array is full\n");
         }
     }
+
+    fWriteTraceroute(t, filename);
 
     return EXIT_SUCCESS;
 }

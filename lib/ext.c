@@ -131,7 +131,7 @@ traceroute *fReadTraceroute(char *filename)
     return t;
 }
 
-void fWriteTraceroute(traceroute *t, char *filename)
+int fWriteTraceroute(traceroute *t, char *filename)
 {
     FILE *f;
     // char *filename = "/home/erlend/C-programming/library-test/write_test.txt";
@@ -148,13 +148,13 @@ void fWriteTraceroute(traceroute *t, char *filename)
     if ((f = fopen(filename, "a+")) == NULL)
     {
         fprintf(stderr, "Error opening file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
-        exit(EXIT_FAILURE);
+        return -1;
     }
 
     if (flock(fileno(f), LOCK_EX) == -1) // exclusive lock - only 1 file may operate on it at a time
     {
         fprintf(stderr, "Error locking file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
-        exit(EXIT_FAILURE);
+        return -1;
     }
 
     fwrite(&t, sizeof(traceroute), 1, f);
@@ -165,9 +165,15 @@ void fWriteTraceroute(traceroute *t, char *filename)
     fclose(f);
 }
 
-void printTraceroute(traceroute *t);
+int printTraceroute(traceroute *t)
+{
+    return 0;
+}
 
-char *tracerouteToJSON(traceroute *t);
+char *tracerouteToJSON(traceroute *t)
+{
+    return 0;
+}
 
 //char *createFileName(struct tm *currentTime) // (Might not be needed)
 //{

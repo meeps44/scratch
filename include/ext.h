@@ -109,14 +109,14 @@ int getFlowLabel(address *a);
  *
  * @param t
  */
-void fWriteTraceroute(traceroute *t, char *filename);
+int fWriteTraceroute(traceroute *t, char *filename);
 
 /**
  * @brief Prints each individual field of a traceroute object to STDOUT.
  *
  * @param t
  */
-void printTraceroute(traceroute *t);
+int printTraceroute(traceroute *t);
 
 /**
  * @brief Convert a traceroute object to JSON.
