@@ -19,13 +19,17 @@ int main(void)
         first_run = 0;
     } 
 
-    hop *h = createHop();
-    h->hopnumber = 1;
-    h->hop_address;
-    h->returned_flowlabel;
-    if (appendHop(h, t) == -1)
+    // Create 36 hops
+    for (int i = 0; i < 36; i++)
     {
-        fprintf(stderr, "Failed to append hop: Hop array is full\n");
+        hop *h = createHop();
+        h->hopnumber = i;
+        h->hop_address;
+        h->returned_flowlabel;
+        if (appendHop(h, t) == -1)
+        {
+            fprintf(stderr, "Failed to append hop: Hop array is full\n");
+        }
     }
 
     return EXIT_SUCCESS;

@@ -156,7 +156,7 @@ int appendHop(hop *h, traceroute *t);
 int appendAddress(address *a, traceroute *t, int hopnumber, int returned_flowlabel);
 
 /**
- * @brief Convert IPv6 address object to C string (null-terminated
+ * @brief Converts an IPv6 address object to a C-string (null-terminated
  * array of characters).
  * 
  * @param a Pointer to IPv6 address object
