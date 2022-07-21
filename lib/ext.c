@@ -167,17 +167,21 @@ int fWriteTraceroute(traceroute *t, char *filename)
 
 int printHop(hop *h)
 {
+    printf("Returned flow label:\t%u\n", h->returned_flowlabel);
+    printf("Hop number:\t%d\n", h->hopnumber);
+    printAddress(h->hop_address);
     return 0;
 }
 
 int printAddress(address *a)
 {
+    char *address_string = addressToString(a);
+    printf("Address:\t%s\n", address_string);
     return 0;
 }
 
 int printTraceroute(traceroute *t)
 {
-    address *a;
     /*
     uint16_t outgoing_tcp_port;
     char *timestamp;
@@ -242,7 +246,7 @@ int appendAddress(address *a, traceroute *t, uint8_t hopnumber, uint32_t returne
     {
         if (tmp->hops[i] == NULL)
         {
-            printf("Available spot found at index:\t%d\n", i);
+            printf("appendAddress:\tAvailable spot found at index:\t%d\n", i);
             hop *h = malloc(sizeof(hop));
             h->hop_address = a;
             h->hopnumber = hopnumber;
@@ -263,7 +267,7 @@ int appendHop(hop *h, traceroute *t)
     {
         if (t->hops[i] == NULL)
         {
-            printf("Available spot found at index:\t%d\n", i);
+            printf("appendHop:\tAvailable spot found at index:\t%d\n", i);
             t->hops[i] = h;
             return 0;
         }
@@ -275,9 +279,15 @@ int appendHop(hop *h, traceroute *t)
 
 char *addressToString(address *a)
 {
-    char *address_string;
+    char *address_string = malloc(sizeof(char)*17); // 1 more extra char for \0-terminator
+    for (int i = 0, k = 0; i < 8; i++, k+=2)
+    {
 
-    // TODO: Finish implementation
+        address_string[k] = (char) a->address_short[i];
+        address_string[k+1] = (char) a->address_short[i] >> 8;
+    }
+
+    address_string[17] = '\0';
 
     return address_string;
 }

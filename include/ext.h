@@ -11,8 +11,8 @@ typedef struct ipv6_address  {
 
 typedef struct hop
 {
-    int returned_flowlabel;
-    int hopnumber;
+    uint32_t returned_flowlabel;
+    uint8_t hopnumber;
     address *hop_address; // Could be a list of address pointers
 } hop;
 
@@ -65,9 +65,10 @@ traceroute *createTraceroute(void);
 hop *createHop(void);
 
 /**
- * @brief Hashes a list of addresses (aka a path).
+ * @brief Creates a hash of all the hops in a path and returns the result
+ * We define a path as an ordered, indexed set of hops to a destination.
  * 
- * @param l 
+ * @param l Ordered list of address pointers that combined comprise a path.
  * @return uint8_t* A pointer to a string containing a 20-char SHA1 digest.
  * 
  * NB! Code must be linked with libopenSSL in order for this to work.
