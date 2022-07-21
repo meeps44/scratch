@@ -177,6 +177,7 @@ int printAddress(address *a)
 
 int printTraceroute(traceroute *t)
 {
+    address *a;
     /*
     uint16_t outgoing_tcp_port;
     char *timestamp;
@@ -194,7 +195,7 @@ int printTraceroute(traceroute *t)
     printAddress(t->destination_ip);
     printf("Destination ASN:\t%d\n", t->destination_asn);
     printf("Path ID:\t%x\n", t->path_id);
-    for (int i = 0; i < t->hop_count)
+    for (int i = 0; i < t->hop_count; i++)
     {
         printHop(t->hops[i]);
     }

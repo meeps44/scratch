@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <openssl/sha.h> // SHA1
 
+#define HOP_MAX 35
+
 typedef struct ipv6_address  {
     uint16_t address_short[8];
 } address;
@@ -30,13 +32,13 @@ typedef struct traceroute
     */
     uint16_t outgoing_tcp_port;
     char *timestamp;
-    address source_ip;
+    address *source_ip;
     uint32_t source_asn;
-    address destination_ip;
+    address *destination_ip;
     uint32_t destination_asn;
     uint8_t path_id[SHA_DIGEST_LENGTH];
     uint8_t hop_count;
-    hop *hops[35]; // maximum hop length is 35. any hops longer than that do not get included.
+    hop *hops[HOP_MAX]; // maximum hop length is 35. any hops longer than that do not get included.
     // Could also be a list of *hop-pointers
 
 } traceroute;
