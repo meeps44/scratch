@@ -69,7 +69,7 @@ hop *createHop(void);
  * We define a path as an ordered, indexed set of hops to a destination.
  * 
  * @param l Ordered list of address pointers that combined comprise a path.
- * @return uint8_t* A pointer to a string containing a 20-char SHA1 digest.
+ * @return uint8_t* List containing the newly created 20-char long SHA1 digest.
  * 
  * NB! Code must be linked with libopenSSL in order for this to work.
  * Linkage example: gcc sha1-in-c.c -lcrypto
@@ -203,5 +203,50 @@ int ptFileToJson(char *filename);
  * @return int 0 on success, -1 on error
  */
 int ptFileToTraceroute(char *filename);
+
+/**
+ * @brief Compares two traceroute paths and returns the hop-number (index)
+ * where they diverged. If the paths did not diverge (they are equal), return 0.
+ * 
+ * @param t1 
+ * @param t2 
+ * @return int 
+ */
+int compareIndexedPaths(traceroute *t1, traceroute *t2);
+
+/**
+ * @brief Compares two traceroute paths.
+ * 
+ * @param t 
+ * @return 0 if equal, -1 if not equal.  
+ */
+int comparePaths(traceroute *t1, traceroute *t2);
+
+/**
+ * @brief Compares all paths to [source], [destination] in file1 against 
+ * all paths with the same [source], [destination] pair in file2 and
+ * returns the hop-number (index) where they diverged. If the paths did not
+ * diverge (they are equal), print EQUAL.
+ * 
+ * @param file1 
+ * @param file2 
+ * @return *char[] Array of strings in the format:
+ * Paths [source], [destination] in [file1], [file2] were EQUAL
+ * Paths [source], [destination] in [file1], [file2] were NOT EQUAL. Diverged
+ * at: [hopnumber].
+ */
+char **fCompareIndexedPaths(char *file1, char *file2);
+
+/**
+ * @brief Compares all paths to [source], [destination] in file1 against 
+ * all paths with the same [source], [destination] pair in file2.
+ * 
+ * @param file1 
+ * @param file2 
+ * @return *char[] Array of strings in the format:
+ * Paths [source], [destination] in [file1], [file2] were EQUAL
+ * Paths [source], [destination] in [file1], [file2] were NOT EQUAL
+ */
+char **fComparePaths(char *file1, char *file2);
 
 #endif

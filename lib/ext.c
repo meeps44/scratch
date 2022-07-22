@@ -49,9 +49,6 @@ hop *createHop()
 
 uint8_t *hashPath(address *l[])
 {
-    // Creates a hash of all the hops in a path and returns the result
-    // We define a path as an ordered, indexed set of hops to a destination.
-
     // The data to be hashed
     SHA_CTX shactx;
     // uint8_t digest[SHA_DIGEST_LENGTH];
