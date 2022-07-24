@@ -206,7 +206,7 @@ int ptFileToJson(char *filename);
 
 /**
  * @brief Loads a .pt-file into memory and converts its content into an
- * array of Traceroute-objects.
+ * array (or linked-list, or hashmap) of Traceroute-objects.
  * 
  * @param filename 
  * @return int 0 on success, -1 on error
