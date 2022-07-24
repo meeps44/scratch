@@ -108,6 +108,15 @@ int asnLookup(address *ipv6_address);
 int getFlowLabel(address *a);
 
 /**
+ * @brief Loads a traceroute object at OFFSET offset in FILE filename 
+ * into memory and returns a pointer to the newly created
+ * object.
+ * 
+ * @param fileName 
+ */
+traceroute *fReadTraceroute(char *filename, long offset);
+
+/**
  * @brief Write a traceroute object to file in binary format.
  * Uses file locking to avoid race conditions
  *
@@ -248,5 +257,13 @@ char **fCompareIndexedPaths(char *file1, char *file2);
  * Paths [source], [destination] in [file1], [file2] were NOT EQUAL
  */
 char **fComparePaths(char *file1, char *file2);
+
+/**
+ * @brief Creates a filename in the form HOSTNAME-CURRENT_TIME.
+ * The filename length is limited to 100 characters.
+ * 
+ * @return Pointer to the filename.
+ */
+char *createFileName(struct tm *now); // (Might not be needed)
 
 #endif

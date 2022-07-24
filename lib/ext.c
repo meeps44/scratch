@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/file.h> // flock()
-#include <unistd.h>
+#include <unistd.h> // getHostname()
 #include <errno.h>
 #include <string.h>
 #include <time.h>
@@ -99,15 +99,7 @@ int asnLookup(address *ipv6_address)
 
 // int getFlowLabel(parsed_packet *p);
 
-// 
-// 
-/**
- * @brief Loads a traceroute object into memory, parses it and prints out
- * its content.
- * 
- * @param fileName 
- */
-traceroute *fReadTraceroute(char *filename)
+traceroute *fReadTraceroute(char *filename, long offset)
 {
     FILE *f;
     traceroute *t = calloc(1, sizeof(traceroute));
@@ -204,32 +196,33 @@ int printTraceroute(traceroute *t)
     return 0;
 }
 
-
-
 char *tracerouteToJSON(traceroute *t)
 {
     return 0;
 }
 
-//char *createFileName(struct tm *currentTime) // (Might not be needed)
-//{
-    //char *fileName;
+char *createFileName(struct tm *now) // (Might not be needed)
+{
+    // TODO: Implement malloc guards (check malloc return value for errors)
+    char *fileName = malloc(sizeof(char) * 100);
+    char *hostname = malloc(sizeof(char) * 30);
+    char *timestamp = malloc(sizeof(char) * 50);
+    gethostname(hostname, 30);
 
-    //return fileName;
-//}
+    // Output timestamp in format "YYYY-MM-DD-hh_mm_ss : "
+    sprintf(timestamp, "-%04d-%02d-%02d-%02d_%02d_%02d",
+           now->tm_year + 1900, now->tm_mon + 1, now->tm_mday,
+           now->tm_hour, now->tm_min, now->tm_sec);
+
+    strcat(hostname, timestamp);
+
+    return fileName;
+}
 
 struct tm *getCurrentTime()
 {
-    // time_t t = time(NULL);
-    // struct tm tm = *localtime(&t);
-    // printf("now: %d-%02d-%02d %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-
     time_t t = time(NULL);
     struct tm *now = gmtime(&t);
-    // Output timestamp in format "YYYY-MM-DD hh:mm:ss : "
-    printf("%04d-%02d-%02d %02d:%02d:%02d : ",
-           now->tm_year + 1900, now->tm_mon + 1, now->tm_mday,
-           now->tm_hour, now->tm_min, now->tm_sec);
 
     return now;
 }
