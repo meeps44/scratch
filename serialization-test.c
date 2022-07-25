@@ -84,5 +84,23 @@ int main(void)
     // fread(t3, sizeof(traceroute), 1, file);
     fscanf(file, TRACEROUTE_FORMAT_IN, 50, t2.timestamp, t2.hop_count, t2.destination_asn);
 
+
+
+    // EOF TEST //
+    // ref.: https://www.tutorialspoint.com/c_standard_library/c_function_fopen.htm
+    FILE *fp;
+    int c;
+    
+    fp = fopen("file.txt","r");
+    while(1) {
+        c = fgetc(fp);
+        if( feof(fp) ) { 
+            break ;
+        }
+        printf("%c", c);
+    }
+    fclose(fp);
+    // END EOF TEST //
+
     return EXIT_SUCCESS;
 }
