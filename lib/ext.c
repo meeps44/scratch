@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/file.h> // flock()
@@ -111,7 +112,13 @@ traceroute *fReadTraceroute(char *filename, long offset)
     }
 
     /* Seek to the beginning of the file */
-    fseek(f, 0, SEEK_SET);
+    // fseek(f, 0, SEEK_SET);
+
+    /* Seek to offset within file.
+    The offset should always be a multiple of sizeof(traceroute)*/
+    assert(offset % sizeof(traceroute) == 0); // erlend - remember to remove in prod!
+    
+    fseek(f, offset, SEEK_SET);
 
     /* Read and display data */
     fread(t, sizeof(traceroute), 1, f);
@@ -280,4 +287,53 @@ char *addressToString(address *a)
     address_string[17] = '\0';
 
     return address_string;
+}
+
+int ptFileToJson(char *filename)
+{
+    return 0;
+}
+
+int ptFileToTraceroute(char *filename)
+{
+    FILE *f;
+    traceroute *t = calloc(1, sizeof(traceroute));
+
+    if ((f = fopen(filename, "r")) == NULL)
+    {
+        fprintf(stderr, "Error opening file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+
+    /* Seek to the beginning of the file */
+    fseek(f, 0, SEEK_SET);
+
+    /* Read and display data */
+    fread(t, sizeof(traceroute), 1, f);
+    fclose(f);
+
+    return t;
+    return 0;
+}
+
+int compareIndexedPaths(traceroute *t1, traceroute *t2)
+{
+    return 0;
+}
+
+int comparePaths(traceroute *t1, traceroute *t2)
+{
+    return 0;
+}
+
+char **fCompareIndexedPaths(char *file1, char *file2)
+{
+
+    return 0;
+}
+
+char **fComparePaths(char *file1, char *file2)
+{
+
+    return 0;
 }
