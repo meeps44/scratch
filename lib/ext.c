@@ -11,6 +11,8 @@
 
 #define DEBUG_ON 1
 
+static const char* TRACEROUTE_FORMAT_IN = "%[^,], %d, %d";
+static const char* TRACEROUTE_FORMAT_OUT = "%s, %d, %d";
 
 address *createAddress()
 {
@@ -100,7 +102,7 @@ int asnLookup(address *ipv6_address)
 
 // int getFlowLabel(parsed_packet *p);
 
-traceroute *fReadTraceroute(char *filename, long offset)
+traceroute *readTracerouteFromFile(char *filename, long offset)
 {
     FILE *f;
     traceroute *t = calloc(1, sizeof(traceroute));
@@ -111,13 +113,9 @@ traceroute *fReadTraceroute(char *filename, long offset)
         exit(EXIT_FAILURE);
     }
 
-    /* Seek to the beginning of the file */
-    // fseek(f, 0, SEEK_SET);
-
     /* Seek to offset within file.
     The offset should always be a multiple of sizeof(traceroute)*/
     assert(offset % sizeof(traceroute) == 0); // erlend - remember to remove in prod!
-    
     fseek(f, offset, SEEK_SET);
 
     /* Read and display data */
@@ -127,21 +125,13 @@ traceroute *fReadTraceroute(char *filename, long offset)
     return t;
 }
 
-int fWriteTraceroute(traceroute *t, char *filename)
+int writeTracerouteToFile(traceroute *t, char *filename)
 {
     FILE *f;
-    // char *filename = "/home/erlend/C-programming/library-test/write_test.txt";
     size_t numb_elements = 1;
     int my_int = 42;
-    // address my_struct = {
-        // .a = 52,
-        // .b = 1,
-        // .c = 96,
-        // .d = 8765};
-    // char my_str[50] = "Hello from process 1!\n";
 
-    // opens a file for reading and appending
-    if ((f = fopen(filename, "a+")) == NULL)
+    if ((f = fopen(filename, "a+")) == NULL) // Open file for reading and appending
     {
         fprintf(stderr, "Error opening file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
         return -1;
@@ -352,16 +342,21 @@ int comparePaths(traceroute *t1, traceroute *t2)
     return -1;
 }
 
-static void readTracerouteFile(char *filename, traceroute *tr_arr[], int arraySize)
+int writeTracerouteFile(char *filename, traceroute *tr_arr[], int arraySize)
 {
-    const char* TRACEROUTE_FORMAT_IN = "%[^,], %d, %d";
-    const char* TRACEROUTE_FORMAT_OUT = "%s, %d, %d";
+    for (int i = 0; i < arraySize; i++)
+    {
+        fprintf(filename, TRACEROUTE_FORMAT_OUT, t1.timestamp, t1.hop_count, t1.destination_asn);
+    }
+}
 
+int readTracerouteFile(char *filename, traceroute *tr_arr[], int arraySize)
+{
     FILE *file;
     if ((file = fopen(filename, "r")) == NULL)
     {
         perror("Error:");
-        return 1;
+        return -1;
     } 
 
     rewind(file);

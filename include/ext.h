@@ -114,7 +114,7 @@ int getFlowLabel(address *a);
  * 
  * @param fileName 
  */
-traceroute *fReadTraceroute(char *filename, long offset);
+traceroute *readTracerouteFromFile(char *filename, long offset);
 
 /**
  * @brief Write a traceroute object to file in binary format.
@@ -122,7 +122,7 @@ traceroute *fReadTraceroute(char *filename, long offset);
  *
  * @param t
  */
-int fWriteTraceroute(traceroute *t, char *filename);
+int writeTracerouteToFile(traceroute *t, char *filename);
 
 /**
  * @brief Prints each individual field of a traceroute object to STDOUT.
@@ -274,5 +274,26 @@ int compareHops(hop *h1, hop *h2);
  * @return int 1 if equal, 0 if not equal.  
  */
 int compareAddresses(address *a1, address *a2);
+
+/**
+ * @brief Writes all traceroute objects in tr_array to filename.
+ * 
+ * @param filename 
+ * @param tr_arr 
+ * @param arraySize 
+ * @return int 
+ */
+int writeTracerouteFile(char *filename, traceroute *tr_arr[], int arraySize);
+
+/**
+ * @brief Reads arraySize number of traceroute objects from filename into
+ * array tr_arr.
+ * 
+ * @param filename 
+ * @param tr_arr 
+ * @param arraySize 
+ * @return int 
+ */
+int readTracerouteFile(char *filename, traceroute *tr_arr[], int arraySize);
 
 #endif
