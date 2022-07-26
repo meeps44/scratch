@@ -326,22 +326,19 @@ int comparePaths(traceroute *t1, traceroute *t2)
     return 0;
 }
 
-static void readTracerouteFile(char *filename, traceroute *tr_arr[])
+static void readTracerouteFile(char *filename, traceroute *tr_arr[], int arraySize)
 {
     const char* TRACEROUTE_FORMAT_IN = "%[^,], %d, %d";
     const char* TRACEROUTE_FORMAT_OUT = "%s, %d, %d";
 
     FILE *file;
-    if ((file = fopen(file, "r")) == NULL)
+    if ((file = fopen(filename, "r")) == NULL)
     {
         perror("Error:");
         return 1;
     } 
 
     rewind(file);
-    int tr_count = 16000;
-    // traceroute *tr_arr1[tr_count];
-
     traceroute *t;
     int i = 0;
     while (1)
@@ -349,18 +346,31 @@ static void readTracerouteFile(char *filename, traceroute *tr_arr[])
         t = calloc(1, sizeof(traceroute));
         fscanf(file, TRACEROUTE_FORMAT_IN, t->timestamp, &t->hop_count, &t->destination_asn);
         tr_arr[i] = t;
-        if (feof(file))
+        if (feof(file) || (i >= (arraySize-1)) )
         {
             break;
         }
         i++;
     }
-
 }
 
 char **fCompareIndexedPaths(char *file1, char *file2)
 {
+    int arraySize = 16000;
 
+    traceroute *arr1[arraySize];
+    traceroute *arr2[arraySize];
+
+    readTracerouteFile(file1, arr1, arraySize);
+    readTracerouteFile(file2, arr1, arraySize);
+
+    for (int i = 0; i < arraySize; i++)
+    {
+        for (int j = 0; j < arraySize; j++)
+        {
+
+        }
+    }
 
     return 0;
 }
