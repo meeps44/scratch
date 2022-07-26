@@ -194,17 +194,6 @@ int appendAddress(address *a, traceroute *t, uint8_t hopnumber, uint32_t returne
 char *addressToString(address *a);
 
 /**
- * @brief Loads a .pt-file into memory, converts its content into an
- * array of Traceroute-objects and prints the output to STDOUT
- * in JSON-format.
- * (may be reduntant?)
- * 
- * @param filename 
- * @return int 
- */
-int ptFileToJson(char *filename);
-
-/**
  * @brief Loads a .pt-file into memory and converts its content into an
  * array (or linked-list, or hashmap) of Traceroute-objects.
  * 
@@ -280,8 +269,8 @@ int compareHops(hop *h1, hop *h2);
 /**
  * @brief Compares two address objects and checks if they are equal.
  * 
- * @param a1 
- * @param a2 
+ * @param a1 Pointer to the first address object.
+ * @param a2 Pointer to the second address object.
  * @return int 1 if equal, 0 if not equal.  
  */
 int compareAddresses(address *a1, address *a2);

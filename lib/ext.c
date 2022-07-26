@@ -273,7 +273,6 @@ int appendHop(hop *h, traceroute *t)
     return -1;
 }
 
-
 char *addressToString(address *a)
 {
     char *address_string = malloc(sizeof(char)*17); // 1 more extra char for \0-terminator
@@ -287,11 +286,6 @@ char *addressToString(address *a)
     address_string[17] = '\0';
 
     return address_string;
-}
-
-int ptFileToJson(char *filename)
-{
-    return 0;
 }
 
 int ptFileToTraceroute(char *filename)
