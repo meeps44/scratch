@@ -227,7 +227,7 @@ int compareIndexedPaths(traceroute *t1, traceroute *t2);
  * @brief Compares two traceroute paths.
  * 
  * @param t 
- * @return 0 if equal, -1 if not equal.  
+ * @return 1 if equal, 0 if not equal, -1 on error.
  */
 int comparePaths(traceroute *t1, traceroute *t2);
 
@@ -265,5 +265,25 @@ char **fComparePaths(char *file1, char *file2);
  * @return Pointer to the filename.
  */
 char *createFileName(struct tm *now); // (Might not be needed)
+
+
+/**
+ * @brief Compares two hops and checks if they are equal. (Function 
+ * might not be needed).
+ * 
+ * @param h1 
+ * @param h2 
+ * @return int 1 if equal, 0 if not equal.  
+ */
+int compareHops(hop *h1, hop *h2);
+
+/**
+ * @brief Compares two address objects and checks if they are equal.
+ * 
+ * @param a1 
+ * @param a2 
+ * @return int 1 if equal, 0 if not equal.  
+ */
+int compareAddresses(address *a1, address *a2);
 
 #endif
