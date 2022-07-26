@@ -326,8 +326,41 @@ int comparePaths(traceroute *t1, traceroute *t2)
     return 0;
 }
 
+static void readTracerouteFile(char *filename, traceroute *tr_arr[])
+{
+    const char* TRACEROUTE_FORMAT_IN = "%[^,], %d, %d";
+    const char* TRACEROUTE_FORMAT_OUT = "%s, %d, %d";
+
+    FILE *file;
+    if ((file = fopen(file, "r")) == NULL)
+    {
+        perror("Error:");
+        return 1;
+    } 
+
+    rewind(file);
+    int tr_count = 16000;
+    // traceroute *tr_arr1[tr_count];
+
+    traceroute *t;
+    int i = 0;
+    while (1)
+    {
+        t = calloc(1, sizeof(traceroute));
+        fscanf(file, TRACEROUTE_FORMAT_IN, t->timestamp, &t->hop_count, &t->destination_asn);
+        tr_arr[i] = t;
+        if (feof(file))
+        {
+            break;
+        }
+        i++;
+    }
+
+}
+
 char **fCompareIndexedPaths(char *file1, char *file2)
 {
+
 
     return 0;
 }
