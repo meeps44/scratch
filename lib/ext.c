@@ -357,6 +357,8 @@ static void readTracerouteFile(char *filename, traceroute *tr_arr[], int arraySi
 char **fCompareIndexedPaths(char *file1, char *file2)
 {
     int arraySize = 16000;
+    char *results[arraySize];
+    int resultsIndex = 0;
 
     traceroute *arr1[arraySize];
     traceroute *arr2[arraySize];
@@ -368,7 +370,14 @@ char **fCompareIndexedPaths(char *file1, char *file2)
     {
         for (int j = 0; j < arraySize; j++)
         {
-
+            if (compareIndexedPaths(arr1[i], arr2[j]) == 0) // equal!
+            {
+                results[resultsIndex] = "Src %s Dst %s are equal";
+                resultsIndex++;
+            } else {
+                results[resultsIndex] = "Src %s Dst %s are NOT equal, the paths diverged at index: %d";
+                resultsIndex++;
+            }
         }
     }
 
@@ -377,6 +386,30 @@ char **fCompareIndexedPaths(char *file1, char *file2)
 
 char **fComparePaths(char *file1, char *file2)
 {
+    int arraySize = 16000;
+    char *results[arraySize];
+    int resultsIndex = 0;
+
+    traceroute *arr1[arraySize];
+    traceroute *arr2[arraySize];
+
+    readTracerouteFile(file1, arr1, arraySize);
+    readTracerouteFile(file2, arr1, arraySize);
+
+    for (int i = 0; i < arraySize; i++)
+    {
+        for (int j = 0; j < arraySize; j++)
+        {
+            if (comparePaths(arr1[i], arr2[j]) == 0) // equal!
+            {
+                results[resultsIndex] = "Src %s Dst %s are equal";
+                resultsIndex++;
+            } else {
+                results[resultsIndex] = "Src %s Dst %s are NOT equal";
+                resultsIndex++;
+            }
+        }
+    }
 
     return 0;
 }
