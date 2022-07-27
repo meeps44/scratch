@@ -303,7 +303,7 @@ int compareAddresses(address *a1, address *a2);
  * @param arraySize
  * @return int
  */
-int writeTracerouteFile(char *filename, traceroute *tr_arr[], int arraySize);
+int writeTracerouteArrayToFile(char *filename, traceroute *tr_arr[], int arraySize);
 
 /**
  * @brief Reads arraySize number of traceroute objects from filename into
@@ -314,6 +314,6 @@ int writeTracerouteFile(char *filename, traceroute *tr_arr[], int arraySize);
  * @param arraySize
  * @return int
  */
-int readTracerouteFile(char *filename, traceroute *tr_arr[], int arraySize);
+int readTracerouteArrayFromFile(char *filename, traceroute *tr_arr[], int arraySize);
 
 #endif

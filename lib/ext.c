@@ -373,7 +373,7 @@ int comparePaths(traceroute *t1, traceroute *t2)
     return -1;
 }
 
-int writeTracerouteFile(char *filename, traceroute *tr_arr[], int arraySize)
+int writeTracerouteArrayToFile(char *filename, traceroute *tr_arr[], int arraySize)
 {
     for (int i = 0; i < arraySize; i++)
     {
@@ -381,7 +381,7 @@ int writeTracerouteFile(char *filename, traceroute *tr_arr[], int arraySize)
     }
 }
 
-int readTracerouteFile(char *filename, traceroute *tr_arr[], int arraySize)
+int readTracerouteArrayFromFile(char *filename, traceroute *tr_arr[], int arraySize)
 {
     FILE *file;
     if ((file = fopen(filename, "r")) == NULL)
