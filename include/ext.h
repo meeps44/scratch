@@ -68,6 +68,8 @@ hop *createHop(void);
 /**
  * @brief Prints a hash digest to a unsigned char buffer.
  * The buffer should be at least size 41 or greater.
+ * NB! For successful memcmp() between two buffers, the buffer size needs to
+ *  be exactly size 41.
  *
  * @param digest The hash digest in the form of an array of unsigned
  * characters of size SHA_DIGEST_LENGTH.
