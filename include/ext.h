@@ -5,7 +5,8 @@
 
 #define HOP_MAX 35
 
-typedef struct ipv6_address  {
+typedef struct ipv6_address
+{
     uint16_t address_short[8];
 } address;
 
@@ -45,40 +46,59 @@ typedef struct traceroute
 
 /**
  * @brief Create an address object initialized to zero
- * 
+ *
  * @return address* Pointer to the new address object
  */
 address *createAddress(void);
 
 /**
  * @brief Create a Traceroute object initialized to zero
- * 
- * @return traceroute* 
+ *
+ * @return traceroute*
  */
 traceroute *createTraceroute(void);
 
 /**
  * @brief Create a Hop object initalized to zero
- * 
- * @return hop* 
+ *
+ * @return hop*
  */
 hop *createHop(void);
 
 /**
- * @brief Creates a hash of all the hops in a path and returns the result
+ * @brief Prints a hash digest to a unsigned char buffer.
+ * The buffer should be at least size 41 or greater.
+ *
+ * @param digest The hash digest in the form of an array of unsigned
+ * characters of size SHA_DIGEST_LENGTH.
+ * @param s The destination buffer.
+ */
+void sPrintHash(uint8_t *digest, char *s);
+
+/**
+ * @brief Prints a hash digest to STDOUT.
+ *
+ * @param digest The hash digest in the form of an array of unsigned
+ * characters of size SHA_DIGEST_LENGTH.
+ */
+void printHash(uint8_t digest[]);
+
+/**
+ * @brief Creates a hash of all the hops in a path and returns the resulting
+ * digest.
  * We define a path as an ordered, indexed set of hops to a destination.
- * 
+ *
  * @param l Ordered list of address pointers that combined comprise a path.
  * @return uint8_t* List containing the newly created 20-char long SHA1 digest.
- * 
+ *
  * NB! Code must be linked with libopenSSL in order for this to work.
  * Linkage example: gcc sha1-in-c.c -lcrypto
  */
-uint8_t *hashPath(address *l[]);
+uint8_t *hashPath(address arr[], int arraySize);
 
 /**
  * @brief Performs ASN-lookup of a given IPv6-address.
- * 
+ *
  * @param ipv6_address The IPv6-address on which to lookup.
  * @return int The AS number associated with this address
  */
@@ -108,11 +128,11 @@ int asnLookup(address *ipv6_address);
 int getFlowLabel(address *a);
 
 /**
- * @brief Loads a traceroute object at OFFSET offset in FILE filename 
+ * @brief Loads a traceroute object at OFFSET offset in FILE filename
  * into memory and returns a pointer to the newly created
  * object.
- * 
- * @param fileName 
+ *
+ * @param fileName
  */
 traceroute *readTracerouteFromFile(char *filename, long offset);
 
@@ -133,17 +153,17 @@ int printTraceroute(traceroute *t);
 
 /**
  * @brief Prints each individual field of an address object to STDOUT
- * 
- * @param a 
- * @return int 
+ *
+ * @param a
+ * @return int
  */
 int printAddress(address *a);
 
 /**
  * @brief Prints each individual field of a hop object to STDOUT
- * 
- * @param h 
- * @return int 
+ *
+ * @param h
+ * @return int
  */
 int printHop(hop *h);
 
@@ -162,23 +182,22 @@ char *tracerouteToJSON(traceroute *t);
  */
 struct tm *getCurrentTime(void);
 
-
 /**
  * @brief Appends hop-object to the next available spot in the
  * hops-array. Returns -1 if the array is full.
- * 
- * @param h 
- * @param t 
- * @return int 
+ *
+ * @param h
+ * @param t
+ * @return int
  */
 int appendHop(hop *h, traceroute *t);
 
 /**
  * @brief Appends an address-object to the next available spot in the
  * hops-array. Returns -1 if the array is full, 0 if executed correctly.
- * 
- * @param a 
- * @param t 
+ *
+ * @param a
+ * @param t
  * @return int Returns -1 if the array is full, 0 if executed correctly with no
  * errors.
  */
@@ -187,7 +206,7 @@ int appendAddress(address *a, traceroute *t, uint8_t hopnumber, uint32_t returne
 /**
  * @brief Converts an IPv6 address object to a C-string (null-terminated
  * array of characters).
- * 
+ *
  * @param a Pointer to IPv6 address object
  * @return char* Pointer to the first character in the character array
  */
@@ -196,8 +215,8 @@ char *addressToString(address *a);
 /**
  * @brief Loads a .pt-file into memory and converts its content into an
  * array (or linked-list, or hashmap) of Traceroute-objects.
- * 
- * @param filename 
+ *
+ * @param filename
  * @return int 0 on success, -1 on error
  */
 int ptFileToTraceroute(char *filename);
@@ -205,29 +224,29 @@ int ptFileToTraceroute(char *filename);
 /**
  * @brief Compares two traceroute paths and returns the hop-number (index)
  * where they diverged. If the paths did not diverge (they are equal), return 0.
- * 
- * @param t1 
- * @param t2 
- * @return int 
+ *
+ * @param t1
+ * @param t2
+ * @return int
  */
 int compareIndexedPaths(traceroute *t1, traceroute *t2);
 
 /**
  * @brief Compares two traceroute paths.
- * 
- * @param t 
+ *
+ * @param t
  * @return 1 if equal, 0 if not equal, -1 on error.
  */
 int comparePaths(traceroute *t1, traceroute *t2);
 
 /**
- * @brief Compares all paths to [source], [destination] in file1 against 
+ * @brief Compares all paths to [source], [destination] in file1 against
  * all paths with the same [source], [destination] pair in file2 and
  * returns the hop-number (index) where they diverged. If the paths did not
  * diverge (they are equal), print EQUAL.
- * 
- * @param file1 
- * @param file2 
+ *
+ * @param file1
+ * @param file2
  * @return *char[] Array of strings in the format:
  * Paths [source], [destination] in [file1], [file2] were EQUAL
  * Paths [source], [destination] in [file1], [file2] were NOT EQUAL. Diverged
@@ -236,11 +255,11 @@ int comparePaths(traceroute *t1, traceroute *t2);
 char **fCompareIndexedPaths(char *file1, char *file2);
 
 /**
- * @brief Compares all paths to [source], [destination] in file1 against 
+ * @brief Compares all paths to [source], [destination] in file1 against
  * all paths with the same [source], [destination] pair in file2.
- * 
- * @param file1 
- * @param file2 
+ *
+ * @param file1
+ * @param file2
  * @return *char[] Array of strings in the format:
  * Paths [source], [destination] in [file1], [file2] were EQUAL
  * Paths [source], [destination] in [file1], [file2] were NOT EQUAL
@@ -250,49 +269,48 @@ char **fComparePaths(char *file1, char *file2);
 /**
  * @brief Creates a filename in the form HOSTNAME-CURRENT_TIME.
  * The filename length is limited to 100 characters.
- * 
+ *
  * @return Pointer to the filename.
  */
 char *createFileName(struct tm *now); // (Might not be needed)
 
-
 /**
- * @brief Compares two hops and checks if they are equal. (Function 
+ * @brief Compares two hops and checks if they are equal. (Function
  * might not be needed).
- * 
- * @param h1 
- * @param h2 
- * @return int 1 if equal, 0 if not equal.  
+ *
+ * @param h1
+ * @param h2
+ * @return int 1 if equal, 0 if not equal.
  */
 int compareHops(hop *h1, hop *h2);
 
 /**
  * @brief Compares two address objects and checks if they are equal.
- * 
+ *
  * @param a1 Pointer to the first address object.
  * @param a2 Pointer to the second address object.
- * @return int 1 if equal, 0 if not equal.  
+ * @return int 1 if equal, 0 if not equal.
  */
 int compareAddresses(address *a1, address *a2);
 
 /**
  * @brief Writes all traceroute objects in tr_array to filename.
- * 
- * @param filename 
- * @param tr_arr 
- * @param arraySize 
- * @return int 
+ *
+ * @param filename
+ * @param tr_arr
+ * @param arraySize
+ * @return int
  */
 int writeTracerouteFile(char *filename, traceroute *tr_arr[], int arraySize);
 
 /**
  * @brief Reads arraySize number of traceroute objects from filename into
  * array tr_arr.
- * 
- * @param filename 
- * @param tr_arr 
- * @param arraySize 
- * @return int 
+ *
+ * @param filename
+ * @param tr_arr
+ * @param arraySize
+ * @return int
  */
 int readTracerouteFile(char *filename, traceroute *tr_arr[], int arraySize);
 

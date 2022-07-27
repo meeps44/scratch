@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/file.h> // flock()
-#include <unistd.h> // getHostname()
+#include <unistd.h>   // getHostname()
 #include <errno.h>
 #include <string.h>
 #include <time.h>
@@ -11,8 +11,8 @@
 
 #define DEBUG_ON 1
 
-static const char* TRACEROUTE_FORMAT_IN = "%[^,], %d, %d";
-static const char* TRACEROUTE_FORMAT_OUT = "%s, %d, %d";
+static const char *TRACEROUTE_FORMAT_IN = "%[^,], %d, %d";
+static const char *TRACEROUTE_FORMAT_OUT = "%s, %d, %d";
 
 address *createAddress()
 {
@@ -50,18 +50,48 @@ hop *createHop()
     return h;
 }
 
-uint8_t *hashPath(address *l[])
+void sPrintHash(uint8_t *digest, char *s)
 {
-    // The data to be hashed
+    const int MAX = 41;
+    int i, length = 0;
+    for (i = 0; i < SHA_DIGEST_LENGTH; i++)
+    {
+        length += snprintf(s + length, MAX - length, "%02x", digest[i]);
+    }
+}
+
+void printHash(uint8_t *digest)
+{
+    int i;
+    for (i = 0; i < SHA_DIGEST_LENGTH; i++)
+    {
+        printf("%02x", digest[i]);
+    }
+    printf("\n");
+}
+
+uint8_t *hashPath(address arr[], int arraySize)
+{
+    // // The data to be hashed
+    // SHA_CTX shactx;
+    // // uint8_t digest[SHA_DIGEST_LENGTH];
+    // uint8_t *digest = (uint8_t *)calloc(SHA_DIGEST_LENGTH, sizeof(uint8_t));
+    // SHA1_Init(&shactx);
+    // SHA1_Update(&shactx, l, sizeof(traceroute));
+    // SHA1_Final(digest, &shactx); // digest now contains the 20-byte SHA-1 hash
+    // return digest;
+
+    unsigned char *obuf = malloc(sizeof(uint8_t) * 20);
     SHA_CTX shactx;
-    // uint8_t digest[SHA_DIGEST_LENGTH];
-    uint8_t *digest = (uint8_t *) calloc(SHA_DIGEST_LENGTH, sizeof(uint8_t));
 
     SHA1_Init(&shactx);
-    SHA1_Update(&shactx, l, sizeof(traceroute));
-    SHA1_Final(digest, &shactx); // digest now contains the 20-byte SHA-1 hash
-    
-    return digest;
+    for (int i = 0; i < arraySize; i++)
+    {
+        SHA1_Update(&shactx, &arr[i], sizeof(address));
+    }
+    SHA1_Final(obuf, &shactx); // digest now contains the 20-byte SHA-1 hash
+
+    return obuf;
 }
 
 int asnLookup(address *ipv6_address)
@@ -74,9 +104,9 @@ int asnLookup(address *ipv6_address)
 
     sprintf(open_string_buffer, "python3 main.py %d", atoi(addressToString(ipv6_address)));
 
-    #if DEBUG_ON == 1
-        printf("DEBUG:\tvalue of open_string_buffer:\t%s\n", open_string_buffer);
-    #endif
+#if DEBUG_ON == 1
+    printf("DEBUG:\tvalue of open_string_buffer:\t%s\n", open_string_buffer);
+#endif
 
     fp = popen(open_string_buffer, "r");
     if (fp == NULL)
@@ -144,8 +174,8 @@ int writeTracerouteToFile(traceroute *t, char *filename)
     }
 
     fwrite(&t, sizeof(traceroute), 1, f);
-    //fwrite(&my_struct, sizeof(int), sizeof(my_struct) / sizeof(int), f);
-    // fwrite(my_str, sizeof(char), sizeof(my_str), f);
+    // fwrite(&my_struct, sizeof(int), sizeof(my_struct) / sizeof(int), f);
+    //  fwrite(my_str, sizeof(char), sizeof(my_str), f);
 
     flock(fileno(f), LOCK_UN); // unlock file
     fclose(f);
@@ -208,8 +238,8 @@ char *createFileName(struct tm *now) // (Might not be needed)
 
     // Output timestamp in format "YYYY-MM-DD-hh_mm_ss : "
     sprintf(timestamp, "-%04d-%02d-%02d-%02d_%02d_%02d",
-           now->tm_year + 1900, now->tm_mon + 1, now->tm_mday,
-           now->tm_hour, now->tm_min, now->tm_sec);
+            now->tm_year + 1900, now->tm_mon + 1, now->tm_mday,
+            now->tm_hour, now->tm_min, now->tm_sec);
 
     strcat(hostname, timestamp);
 
@@ -265,12 +295,12 @@ int appendHop(hop *h, traceroute *t)
 
 char *addressToString(address *a)
 {
-    char *address_string = malloc(sizeof(char)*17); // 1 more extra char for \0-terminator
-    for (int i = 0, k = 0; i < 8; i++, k+=2)
+    char *address_string = malloc(sizeof(char) * 17); // 1 more extra char for \0-terminator
+    for (int i = 0, k = 0; i < 8; i++, k += 2)
     {
 
-        address_string[k] = (char) a->address_short[i];
-        address_string[k+1] = (char) a->address_short[i] >> 8;
+        address_string[k] = (char)a->address_short[i];
+        address_string[k + 1] = (char)a->address_short[i] >> 8;
     }
 
     address_string[17] = '\0';
@@ -302,12 +332,11 @@ int ptFileToTraceroute(char *filename)
 
 int compareHops(hop *h1, hop *h2)
 {
-
 }
 
 int compareAddresses(address *a1, address *a2)
 {
-    if (memcmp(a1, a2, sizeof(short)*8) == 0)
+    if (memcmp(a1, a2, sizeof(short) * 8) == 0)
         return 1;
     return 0;
 }
@@ -331,7 +360,9 @@ int comparePaths(traceroute *t1, traceroute *t2)
             {
                 puts("The paths are not equal!");
                 return 0;
-            } else {
+            }
+            else
+            {
                 puts("The paths are equal!");
                 return 1;
             }
@@ -357,7 +388,7 @@ int readTracerouteFile(char *filename, traceroute *tr_arr[], int arraySize)
     {
         perror("Error:");
         return -1;
-    } 
+    }
 
     rewind(file);
     traceroute *t;
@@ -367,7 +398,7 @@ int readTracerouteFile(char *filename, traceroute *tr_arr[], int arraySize)
         t = calloc(1, sizeof(traceroute));
         fscanf(file, TRACEROUTE_FORMAT_IN, t->timestamp, &t->hop_count, &t->destination_asn);
         tr_arr[i] = t;
-        if (feof(file) || (i >= (arraySize-1)) )
+        if (feof(file) || (i >= (arraySize - 1)))
         {
             break;
         }
@@ -395,7 +426,9 @@ char **fCompareIndexedPaths(char *file1, char *file2)
             {
                 results[resultsIndex] = "Src %s Dst %s are equal";
                 resultsIndex++;
-            } else {
+            }
+            else
+            {
                 results[resultsIndex] = "Src %s Dst %s are NOT equal, the paths diverged at index: %d";
                 resultsIndex++;
             }
@@ -425,7 +458,9 @@ char **fComparePaths(char *file1, char *file2)
             {
                 results[resultsIndex] = "Src %s Dst %s are equal";
                 resultsIndex++;
-            } else {
+            }
+            else
+            {
                 results[resultsIndex] = "Src %s Dst %s are NOT equal";
                 resultsIndex++;
             }

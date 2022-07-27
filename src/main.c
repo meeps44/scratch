@@ -10,7 +10,7 @@ int main(void)
     traceroute *t;
     int result;
 
-    if(first_run)
+    if (first_run)
     {
         t = calloc(1, sizeof(traceroute));
         t->timestamp;
@@ -19,7 +19,7 @@ int main(void)
         t->destination_ip;
         t->source_asn;
         first_run = 0;
-    } 
+    }
 
     // Create 36 hops
     for (int i = 0; i < 36; i++)
