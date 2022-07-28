@@ -132,55 +132,6 @@ int asnLookup(address *ipv6_address)
 
 // int getFlowLabel(parsed_packet *p);
 
-traceroute *readTracerouteFromFile(char *filename, long offset)
-{
-    FILE *f;
-    traceroute *t = calloc(1, sizeof(traceroute));
-
-    if ((f = fopen(filename, "r")) == NULL)
-    {
-        fprintf(stderr, "Error opening file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-
-    /* Seek to offset within file.
-    The offset should always be a multiple of sizeof(traceroute)*/
-    assert(offset % sizeof(traceroute) == 0); // erlend - remember to remove in prod!
-    fseek(f, offset, SEEK_SET);
-
-    /* Read and display data */
-    fread(t, sizeof(traceroute), 1, f);
-    fclose(f);
-
-    return t;
-}
-
-int writeTracerouteToFile(traceroute *t, char *filename)
-{
-    FILE *f;
-    size_t numb_elements = 1;
-    int my_int = 42;
-
-    if ((f = fopen(filename, "a+")) == NULL) // Open file for reading and appending
-    {
-        fprintf(stderr, "Error opening file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
-        return -1;
-    }
-
-    if (flock(fileno(f), LOCK_EX) == -1) // exclusive lock - only 1 file may operate on it at a time
-    {
-        fprintf(stderr, "Error locking file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
-        return -1;
-    }
-
-    fwrite(&t, sizeof(traceroute), 1, f);
-    // fwrite(&my_struct, sizeof(int), sizeof(my_struct) / sizeof(int), f);
-    //  fwrite(my_str, sizeof(char), sizeof(my_str), f);
-
-    flock(fileno(f), LOCK_UN); // unlock file
-    fclose(f);
-}
-
 int printHop(hop *h)
 {
     printf("Returned flow label:\t%u\n", h->returned_flowlabel);
@@ -373,12 +324,26 @@ int comparePaths(traceroute *t1, traceroute *t2)
     return -1;
 }
 
-int writeTracerouteArrayToFile(char *filename, traceroute *tr_arr[], int arraySize)
+int readTracerouteFromFile(char *filename, traceroute *t, long offset)
 {
-    for (int i = 0; i < arraySize; i++)
+    FILE *f;
+
+    if ((f = fopen(filename, "r")) == NULL)
     {
-        fprintf(filename, TRACEROUTE_FORMAT_OUT, t1.timestamp, t1.hop_count, t1.destination_asn);
+        fprintf(stderr, "Error opening file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
+        exit(EXIT_FAILURE);
     }
+
+    /* Seek to offset within file.
+    The offset should always be a multiple of sizeof(traceroute)*/
+    assert(offset % sizeof(traceroute) == 0); // erlend - remember to remove in prod!
+    fseek(f, offset, SEEK_SET);
+
+    /* Read and display data */
+    fread(t, sizeof(traceroute), 1, f);
+    fclose(f);
+
+    return 0;
 }
 
 int readTracerouteArrayFromFile(char *filename, traceroute *tr_arr[], int arraySize)
@@ -404,6 +369,62 @@ int readTracerouteArrayFromFile(char *filename, traceroute *tr_arr[], int arrayS
         }
         i++;
     }
+}
+
+int writeTracerouteToFile(traceroute *t, char *filename)
+{
+    FILE *f;
+    size_t numb_elements = 1;
+    int my_int = 42;
+
+    if ((f = fopen(filename, "a+")) == NULL) // Open file for reading and appending
+    {
+        fprintf(stderr, "Error opening file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
+        return -1;
+    }
+
+    if (flock(fileno(f), LOCK_EX) == -1) // exclusive lock - only 1 file may operate on it at a time
+    {
+        fprintf(stderr, "Error locking file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
+        return -1;
+    }
+
+    fwrite(&t, sizeof(traceroute), 1, f);
+    // fwrite(&my_struct, sizeof(int), sizeof(my_struct) / sizeof(int), f);
+    //  fwrite(my_str, sizeof(char), sizeof(my_str), f);
+
+    flock(fileno(f), LOCK_UN); // unlock file
+    fclose(f);
+}
+
+int writeTracerouteArrayToFile(char *filename, traceroute *tr_arr[], int arraySize)
+{
+    for (int i = 0; i < arraySize; i++)
+    {
+        fprintf(filename, TRACEROUTE_FORMAT_OUT, t1.timestamp, t1.hop_count, t1.destination_asn);
+    }
+    FILE *f;
+    size_t numb_elements = 1;
+    int my_int = 42;
+
+    if ((f = fopen(filename, "a+")) == NULL) // Open file for reading and appending
+    {
+        fprintf(stderr, "Error opening file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
+        return -1;
+    }
+
+    if (flock(fileno(f), LOCK_EX) == -1) // exclusive lock - only 1 file may operate on it at a time
+    {
+        fprintf(stderr, "Error locking file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
+        return -1;
+    }
+
+    fwrite(&t, sizeof(traceroute), 1, f);
+    // fwrite(&my_struct, sizeof(int), sizeof(my_struct) / sizeof(int), f);
+    //  fwrite(my_str, sizeof(char), sizeof(my_str), f);
+
+    flock(fileno(f), LOCK_UN); // unlock file
+    fclose(f);
 }
 
 char **fCompareIndexedPaths(char *file1, char *file2)

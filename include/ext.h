@@ -130,13 +130,17 @@ int asnLookup(address *ipv6_address);
 int getFlowLabel(address *a);
 
 /**
- * @brief Loads a traceroute object at OFFSET offset in FILE filename
- * into memory and returns a pointer to the newly created
- * object.
+ * @brief Loads a traceroute object at OFFSET <offset> in FILE <filename>
+ * into memory at location <t>.
  *
- * @param fileName
+ * @param fileName The file to read from.
+ * @param t Pointer to the destination traceroute object.
+ * @param offset Offset within the file. Must be a multiple of 
+ * sizeof(traceroute).
+ * 
+ * @return int 1 if successful, 0 if error.
  */
-traceroute *readTracerouteFromFile(char *filename, long offset);
+int readTracerouteFromFile(char *filename, traceroute *t, long offset);
 
 /**
  * @brief Write a traceroute object to file in binary format.
