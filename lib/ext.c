@@ -11,8 +11,21 @@
 
 #define DEBUG_ON 1
 
-static const char *TRACEROUTE_FORMAT_IN = "\n%[^,], %d, %d";
-static const char *TRACEROUTE_FORMAT_OUT = "%s, %d, %d\n";
+// uint16_t outgoing_tcp_port;
+// char *timestamp;
+// address *source_ip;
+// uint32_t source_asn;
+// address *destination_ip;
+// uint32_t destination_asn;
+// uint8_t path_id[SHA_DIGEST_LENGTH];
+// uint8_t hop_count;
+// hop *hops[HOP_MAX]; // maximum hop length is 35. any hops longer than that do not get included.
+
+// static const char *TRACEROUTE_FORMAT_IN = "\n%[^,], %d, %d";
+// static const char *TRACEROUTE_FORMAT_OUT = "%s, %d, %d\n";
+
+static const char *TRACEROUTE_FORMAT_IN = "\n%d,%[^,], %[], %d, %[], %d, %[^,], %d, %[]";
+static const char *TRACEROUTE_FORMAT_OUT = "%d, %s, %[], %d, %[], %d, %[^,], %d, %[]\n";
 
 address *createAddress()
 {
@@ -376,19 +389,16 @@ int readTracerouteArrayFromFile(char *filename, traceroute *tr_arr[], int arrayS
 
 int writeTracerouteToFile(traceroute *t, char *filename)
 {
-    /**
-     *
-        uint16_t outgoing_tcp_port;
-        char timestamp[50];
-        address source_ip;
-        uint32_t source_asn;
-        address destination_ip;
-        uint32_t destination_asn;
-        uint8_t path_id[20];
-        uint8_t hop_count;
-        hop hops[35]; // maximum hop length is 35. any hops longer than that do not get included.
-     *
-     */
+
+    // uint16_t outgoing_tcp_port;
+    // char *timestamp;
+    // address *source_ip;
+    // uint32_t source_asn;
+    // address *destination_ip;
+    // uint32_t destination_asn;
+    // uint8_t path_id[SHA_DIGEST_LENGTH];
+    // uint8_t hop_count;
+    // hop *hops[HOP_MAX]; // maximum hop length is 35. any hops longer than that do not get included.
 
     FILE *f;
     size_t numb_elements = 1;

@@ -22,7 +22,7 @@ typedef struct traceroute
     // For easy route comparison - make a hash of the (source_ip, dest_ip, outgoing_flow_label)-tuple and add it
     // as a variable to the struct?
     /*
-            "outgoing_tcp_port": "443",
+        "outgoing_tcp_port": "443",
         "flow_label": "1048575",
         "timestamp": "2022-05-07 15:50:47.559550",
         "source": "2a03:b0c0:1:d0::b45:6001",
