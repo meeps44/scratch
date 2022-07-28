@@ -3,10 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-const char* TRACEROUTE_FORMAT_IN = "%[^,], %d, %d";
-const char* TRACEROUTE_FORMAT_OUT = "%s, %d, %d\n";
+const char *TRACEROUTE_FORMAT_IN = "%[^,], %d, %d";
+const char *TRACEROUTE_FORMAT_OUT = "%s, %d, %d\n";
 
-typedef struct ipv6_address  {
+typedef struct ipv6_address
+{
     uint16_t address_short[8];
 } address;
 
@@ -79,27 +80,25 @@ int main(void)
     fprintf(file, TRACEROUTE_FORMAT_OUT, t1.timestamp, t1.hop_count, t1.destination_asn);
 
     /* Read in from file */
-    fseek(file, 0, SEEK_SET); // Read from beginning of file.
     traceroute *t3 = malloc(sizeof(traceroute));
-    // fread(t3, sizeof(traceroute), 1, file);
+    fseek(file, 0, SEEK_SET); // Read from beginning of file.
     fscanf(file, TRACEROUTE_FORMAT_IN, 50, t2.timestamp, t2.hop_count, t2.destination_asn);
-
-
+    // fread(t3, sizeof(traceroute), 1, file);
 
     // EOF TEST //
     // ref.: https://www.tutorialspoint.com/c_standard_library/c_function_fopen.htm
-    FILE *fp;
-    int c;
-    
-    fp = fopen("file.txt","r");
-    while(1) {
-        c = fgetc(fp);
-        if( feof(fp) ) { 
-            break ;
-        }
-        printf("%c", c);
-    }
-    fclose(fp);
+    // FILE *fp;
+    // int c;
+
+    // fp = fopen("file.txt","r");
+    // while(1) {
+    // c = fgetc(fp);
+    // if( feof(fp) ) {
+    // break ;
+    // }
+    // printf("%c", c);
+    // }
+    // fclose(fp);
     // END EOF TEST //
 
     return EXIT_SUCCESS;

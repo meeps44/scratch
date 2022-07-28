@@ -11,8 +11,8 @@
 
 #define DEBUG_ON 1
 
-static const char *TRACEROUTE_FORMAT_IN = "%[^,], %d, %d";
-static const char *TRACEROUTE_FORMAT_OUT = "%s, %d, %d";
+static const char *TRACEROUTE_FORMAT_IN = "\n%[^,], %d, %d";
+static const char *TRACEROUTE_FORMAT_OUT = "%s, %d, %d\n";
 
 address *createAddress()
 {
@@ -340,7 +340,8 @@ int readTracerouteFromFile(char *filename, traceroute *t, long offset)
     fseek(f, offset, SEEK_SET);
 
     /* Read and display data */
-    fread(t, sizeof(traceroute), 1, f);
+    // fread(t, sizeof(traceroute), 1, f);
+    fscanf(f, TRACEROUTE_FORMAT_IN, t->timestamp, &t->hop_count, &t->destination_asn);
     fclose(f);
 
     return 0;
@@ -369,10 +370,26 @@ int readTracerouteArrayFromFile(char *filename, traceroute *tr_arr[], int arrayS
         }
         i++;
     }
+
+    return 0;
 }
 
 int writeTracerouteToFile(traceroute *t, char *filename)
 {
+    /**
+     *
+        uint16_t outgoing_tcp_port;
+        char timestamp[50];
+        address source_ip;
+        uint32_t source_asn;
+        address destination_ip;
+        uint32_t destination_asn;
+        uint8_t path_id[20];
+        uint8_t hop_count;
+        hop hops[35]; // maximum hop length is 35. any hops longer than that do not get included.
+     *
+     */
+
     FILE *f;
     size_t numb_elements = 1;
     int my_int = 42;
@@ -389,9 +406,9 @@ int writeTracerouteToFile(traceroute *t, char *filename)
         return -1;
     }
 
-    fwrite(&t, sizeof(traceroute), 1, f);
-    // fwrite(&my_struct, sizeof(int), sizeof(my_struct) / sizeof(int), f);
-    //  fwrite(my_str, sizeof(char), sizeof(my_str), f);
+    // fwrite(&t, sizeof(traceroute), 1, f);
+    /* Write to file */
+    fprintf(f, TRACEROUTE_FORMAT_OUT, t->timestamp, t->hop_count, t->destination_asn);
 
     flock(fileno(f), LOCK_UN); // unlock file
     fclose(f);
@@ -399,10 +416,6 @@ int writeTracerouteToFile(traceroute *t, char *filename)
 
 int writeTracerouteArrayToFile(char *filename, traceroute *tr_arr[], int arraySize)
 {
-    for (int i = 0; i < arraySize; i++)
-    {
-        fprintf(filename, TRACEROUTE_FORMAT_OUT, t1.timestamp, t1.hop_count, t1.destination_asn);
-    }
     FILE *f;
     size_t numb_elements = 1;
     int my_int = 42;
@@ -419,9 +432,12 @@ int writeTracerouteArrayToFile(char *filename, traceroute *tr_arr[], int arraySi
         return -1;
     }
 
-    fwrite(&t, sizeof(traceroute), 1, f);
-    // fwrite(&my_struct, sizeof(int), sizeof(my_struct) / sizeof(int), f);
-    //  fwrite(my_str, sizeof(char), sizeof(my_str), f);
+    // fwrite(&t, sizeof(traceroute), 1, f);
+    /* Write to file */
+    for (int i = 0; i < arraySize; i++)
+    {
+        fprintf(filename, TRACEROUTE_FORMAT_OUT, tr_arr[i]->timestamp, tr_arr[i]->hop_count, tr_arr[i]->destination_asn);
+    }
 
     flock(fileno(f), LOCK_UN); // unlock file
     fclose(f);
