@@ -16,6 +16,46 @@ static const char *HOP_FORMAT_OUT = "%d, %d, %d:%d ";
 static const char *TR_TEST_FORMAT_IN = "%d, %[^,], %d:%d, %d, %d:%d, %d, %[^,]";
 static const char *TR_TEST_FORMAT_OUT = "%d, %s, %d:%d, %d, %d:%d, %d, %s, ";
 
+int serialize(char *filePath, traceroute *t)
+{
+    FILE *file;
+    if ((file = fopen("waffles.dat", "w+")) == 0)
+    {
+        return 1;
+    }
+
+    /* Write to file */
+    fprintf(file, TR_TEST_FORMAT_OUT, t->outgoing_tcp_port, t->timestamp, t->source_ip.high_order_bits, t->source_ip.low_order_bits,
+            t->source_asn, t->destination_ip.high_order_bits, t->destination_ip.low_order_bits, t->destination_asn,
+            t->path_id);
+    for (int i = 0; i < 35; i++)
+    {
+        fprintf(file, HOP_FORMAT_OUT, t->hops[i].returned_flowlabel, t->hops[i].hopnumber, t->hops[i].hop_address.high_order_bits, t->hops[i].hop_address.low_order_bits);
+    }
+    return 0;
+}
+
+int deserialize(char *filePath, traceroute *t)
+{
+    FILE *file;
+    if ((file = fopen("waffles.dat", "w+")) == 0)
+    {
+        return 1;
+    }
+
+    /* Read from file */
+    rewind(file);
+    fscanf(file, TR_TEST_FORMAT_IN, &t->outgoing_tcp_port, t->timestamp, &t->source_ip.high_order_bits, &t->source_ip.low_order_bits,
+           &t->source_asn, &t->destination_ip.high_order_bits, &t->destination_ip.low_order_bits, &t->destination_asn,
+           t->path_id);
+    for (int i = 0; i < 35; i++)
+    {
+        fscanf(file, HOP_FORMAT_IN, &t->hops[i].returned_flowlabel, &t->hops[i].hopnumber, &t->hops[i].hop_address.high_order_bits, &t->hops[i].hop_address.low_order_bits);
+    }
+    puts("Done reading from file!");
+    return 0;
+}
+
 int main(void)
 {
     hop hop_arr1[35];
@@ -167,8 +207,3 @@ int main(void)
 #endif
     return 0;
 }
-
-// int serialize()
-// {
-
-// }
