@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define COMBINED_TEST 1
-
 //static const char *HOP_FORMAT_IN = "\n%d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, \
 //%d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, \
 //%d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, \
@@ -15,6 +13,17 @@ static const char *HOP_FORMAT_IN = " %d, %d, %d:%d";
 static const char *HOP_FORMAT_OUT = "%d, %d, %d:%d ";
 static const char *TR_TEST_FORMAT_IN = "%d, %[^,], %d:%d, %d, %d:%d, %d, %[^,]";
 static const char *TR_TEST_FORMAT_OUT = "%d, %s, %d:%d, %d, %d:%d, %d, %s, ";
+
+int printTraceroute(traceroute *t1)
+{
+    printf(TR_TEST_FORMAT_OUT, t1->outgoing_tcp_port, t1->timestamp, t1->source_ip.high_order_bits, t1->source_ip.low_order_bits,
+           t1->source_asn, t1->destination_ip.high_order_bits, t1->destination_ip.low_order_bits, t1->destination_asn,
+           t1->path_id);
+    for (int i = 0; i < 35; i++)
+    {
+        printf(HOP_FORMAT_OUT, t1->hops[i].returned_flowlabel, t1->hops[i].hopnumber, t1->hops[i].hop_address.high_order_bits, t1->hops[i].hop_address.low_order_bits);
+    }
+}
 
 int serialize(char *filePath, traceroute *t)
 {
@@ -114,11 +123,11 @@ int main(void)
     }
     traceroute *t2 = malloc(sizeof(traceroute));
 
-    FILE *file;
-    if ((file = fopen("waffles.dat", "w+")) == 0)
-    {
-        return 1;
-    }
+    // FILE *file;
+    // if ((file = fopen("waffles.dat", "w+")) == 0)
+    //{
+    // return 1;
+    //}
 
 #ifdef TR_TEST
 
@@ -205,5 +214,11 @@ int main(void)
 
     fclose(file);
 #endif
+    char *filename = "waffles.dat";
+    // traceroute *t = malloc(sizeof(traceroute));
+    serialize(filename, &t1);
+    deserialize(filename, &t1);
+    printTraceroute(&t1);
+
     return 0;
 }
