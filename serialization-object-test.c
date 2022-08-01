@@ -5,16 +5,16 @@
 
 #define COMBINED_TEST 1
 
-static const char *ADDRESS_FORMAT_OUT = "%d:%d";
-static const char *HOP_FORMAT_IN = " %d, %d, %d:%d";
 //static const char *HOP_FORMAT_IN = "\n%d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, \
 //%d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, \
 //%d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, \
 //%d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d";
-static const char *HOP_FORMAT_OUT = "%d, %d, %d:%d ";
 // static const char *TR_TEST_FORMAT_OUT = "%d, %s, %x%x:%x%x:%x%x:%x%x, %d, %x%x:%x%x:%x%x:%x%x, %d, %[^,], %d, ";
-static const char *TR_TEST_FORMAT_IN = "\n%d, %[^,], %d:%d, %d, %d:%d, %d, %[^,]";
-static const char *TR_TEST_FORMAT_OUT = "%d, %s, %d:%d, %d, %d:%d, %d, %s,\n";
+// static const char *ADDRESS_FORMAT_OUT = "%d:%d";
+static const char *HOP_FORMAT_IN = " %d, %d, %d:%d";
+static const char *HOP_FORMAT_OUT = "%d, %d, %d:%d ";
+static const char *TR_TEST_FORMAT_IN = "%d, %[^,], %d:%d, %d, %d:%d, %d, %[^,]";
+static const char *TR_TEST_FORMAT_OUT = "%d, %s, %d:%d, %d, %d:%d, %d, %s, ";
 
 int main(void)
 {
@@ -142,6 +142,7 @@ int main(void)
     {
         fprintf(file, HOP_FORMAT_OUT, t1.hops[i].returned_flowlabel, t1.hops[i].hopnumber, t1.hops[i].hop_address.high_order_bits, t1.hops[i].hop_address.low_order_bits);
     }
+    // fprintf(file, "\n");
 
     /* Read from file */
     rewind(file);
