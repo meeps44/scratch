@@ -23,12 +23,13 @@ int printTraceroute(traceroute *t1)
     {
         printf(HOP_FORMAT_OUT, t1->hops[i].returned_flowlabel, t1->hops[i].hopnumber, t1->hops[i].hop_address.high_order_bits, t1->hops[i].hop_address.low_order_bits);
     }
+    puts("");
 }
 
 int serialize(char *filePath, traceroute *t)
 {
     FILE *file;
-    if ((file = fopen("waffles.dat", "w+")) == 0)
+    if ((file = fopen("waffles.dat", "a+")) == 0)
     {
         return 1;
     }
@@ -44,7 +45,7 @@ int serialize(char *filePath, traceroute *t)
     return 0;
 }
 
-int deserialize(char *filePath, traceroute *t)
+int deserialize(char *filePath, traceroute *t, long offset)
 {
     FILE *file;
     if ((file = fopen("waffles.dat", "w+")) == 0)
@@ -53,7 +54,8 @@ int deserialize(char *filePath, traceroute *t)
     }
 
     /* Read from file */
-    rewind(file);
+    fseek(file, offset, SEEK_SET);
+    // rewind(file);
     fscanf(file, TR_TEST_FORMAT_IN, &t->outgoing_tcp_port, t->timestamp, &t->source_ip.high_order_bits, &t->source_ip.low_order_bits,
            &t->source_asn, &t->destination_ip.high_order_bits, &t->destination_ip.low_order_bits, &t->destination_asn,
            t->path_id);
@@ -61,7 +63,6 @@ int deserialize(char *filePath, traceroute *t)
     {
         fscanf(file, HOP_FORMAT_IN, &t->hops[i].returned_flowlabel, &t->hops[i].hopnumber, &t->hops[i].hop_address.high_order_bits, &t->hops[i].hop_address.low_order_bits);
     }
-    puts("Done reading from file!");
     return 0;
 }
 
@@ -217,7 +218,10 @@ int main(void)
     char *filename = "waffles.dat";
     // traceroute *t = malloc(sizeof(traceroute));
     serialize(filename, &t1);
-    deserialize(filename, &t1);
+    deserialize(filename, &t1, 0);
+    printTraceroute(&t1);
+    serialize(filename, &t1);
+    deserialize(filename, &t1, 0);
     printTraceroute(&t1);
 
     return 0;
