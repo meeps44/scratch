@@ -76,7 +76,6 @@ int deserialize_bytes(char *filePath, traceroute *t, long offset)
         return 1;
     }
 
-    /* Read from file */
     fseek(file, offset, SEEK_SET);
     // rewind(file);
     fread(t, sizeof(traceroute), 1, file);
@@ -293,7 +292,7 @@ int main(void)
 
 #ifdef FREAD_TEST
     char *filename = "waffles.dat";
-    int arraySize = 100000;
+    int arraySize = 3;
     // traceroute tr_arr[arraySize];
     // traceroute tr_arr_IN[arraySize];
     traceroute *tr_arr = malloc(sizeof(traceroute) * arraySize);
@@ -315,7 +314,8 @@ int main(void)
     printf("Serialization count:\t%d\n", serialization_count);
     for (int i = 0; i < arraySize; i++)
     {
-        deserialize_bytes(filename, (tr_arr + i), 0);
+        deserialize_bytes(filename, (tr_arr + i), sizeof(traceroute) * i);
+        printTraceroute((tr_arr + i));
     }
     puts("Deserialization done!");
 
