@@ -1,9 +1,10 @@
+#include <errno.h>
 #include "serialization-object-test.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define FREAD_TEST 1
+#define ASN_TEST 1
 //static const char *HOP_FORMAT_IN = "\n%d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, \
 //%d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, \
 //%d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, %d, %d, %d:%d, \
@@ -104,6 +105,38 @@ int deserialize(char *filePath, traceroute *t, long offset)
     }
 
     return 0;
+}
+
+int asnLookup(address *ipv6_address)
+{
+    int ASN;
+    FILE *fp;
+    char input_buffer[1024], open_string_buffer[1024];
+    int num;
+    int i = 1;
+
+    sprintf(open_string_buffer, "python3 python/get_asn.py %d", atoi(addressToString(ipv6_address)));
+
+#if DEBUG_ON == 1
+    printf("DEBUG:\tvalue of open_string_buffer:\t%s\n", open_string_buffer);
+#endif
+
+    fp = popen(open_string_buffer, "r");
+    if (fp == NULL)
+    {
+        perror("Failed to create file pointer\n");
+        fprintf(stderr, "Errno:\t%s\n", strerror(errno));
+        exit(1);
+    }
+
+    while (fgets(input_buffer, sizeof(input_buffer), fp) != NULL)
+    {
+        printf("Read line:\t%d\n", i++);
+        num = atoi(input_buffer);
+        printf("Num = %d\n", num);
+    }
+    pclose(fp);
+    return ASN;
 }
 
 int main(void)
@@ -292,7 +325,7 @@ int main(void)
 
 #ifdef FREAD_TEST
     char *filename = "waffles.dat";
-    int arraySize = 1000000;
+    int arraySize = 2;
     // traceroute tr_arr[arraySize];
     // traceroute tr_arr_IN[arraySize];
     traceroute *tr_arr = malloc(sizeof(traceroute) * arraySize);
@@ -321,6 +354,14 @@ int main(void)
 
     free(tr_arr);
     free(tr_arr_IN);
+#endif
+
+#ifdef ASN_TEST
+    address *a = malloc(sizeof(address));
+    a->high_order_bits = 11;
+    a->low_order_bits = 102;
+    int asn = asnLookup(a);
+    printf("asn: %d\n", asn);
 #endif
 
     return 0;

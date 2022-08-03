@@ -23,9 +23,8 @@
 
 // static const char *TRACEROUTE_FORMAT_IN = "\n%[^,], %d, %d";
 // static const char *TRACEROUTE_FORMAT_OUT = "%s, %d, %d\n";
-
-static const char *TRACEROUTE_FORMAT_IN = "\n%d,%[^,], %[], %d, %[], %d, %[^,], %d, %[]";
-static const char *TRACEROUTE_FORMAT_OUT = "%d, %s, %[], %d, %[], %d, %[^,], %d, %[]\n";
+// static const char *TRACEROUTE_FORMAT_IN = "\n%d,%[^,], %[], %d, %[], %d, %[^,], %d, %[]";
+// static const char *TRACEROUTE_FORMAT_OUT = "%d, %s, %[], %d, %[], %d, %[^,], %d, %[]\n";
 
 address *createAddress()
 {
@@ -85,15 +84,6 @@ void printHash(uint8_t *digest)
 
 uint8_t *hashPath(address arr[], int arraySize)
 {
-    // // The data to be hashed
-    // SHA_CTX shactx;
-    // // uint8_t digest[SHA_DIGEST_LENGTH];
-    // uint8_t *digest = (uint8_t *)calloc(SHA_DIGEST_LENGTH, sizeof(uint8_t));
-    // SHA1_Init(&shactx);
-    // SHA1_Update(&shactx, l, sizeof(traceroute));
-    // SHA1_Final(digest, &shactx); // digest now contains the 20-byte SHA-1 hash
-    // return digest;
-
     unsigned char *obuf = malloc(sizeof(uint8_t) * 20);
     SHA_CTX shactx;
 
@@ -179,6 +169,7 @@ int printTraceroute(traceroute *t)
     printAddress(t->destination_ip);
     printf("Destination ASN:\t%d\n", t->destination_asn);
     printf("Path ID:\t%x\n", t->path_id);
+    printf("Hop count:\t%x\n", t->hop_count);
     for (int i = 0; i < t->hop_count; i++)
     {
         printHop(t->hops[i]);
@@ -272,28 +263,6 @@ char *addressToString(address *a)
     return address_string;
 }
 
-int ptFileToTraceroute(char *filename)
-{
-    FILE *f;
-    traceroute *t = calloc(1, sizeof(traceroute));
-
-    if ((f = fopen(filename, "r")) == NULL)
-    {
-        fprintf(stderr, "Error opening file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-
-    /* Seek to the beginning of the file */
-    fseek(f, 0, SEEK_SET);
-
-    /* Read and display data */
-    fread(t, sizeof(traceroute), 1, f);
-    fclose(f);
-
-    return t;
-    return 0;
-}
-
 int compareHops(hop *h1, hop *h2)
 {
 }
@@ -307,7 +276,6 @@ int compareAddresses(address *a1, address *a2)
 
 int compareIndexedPaths(traceroute *t1, traceroute *t2)
 {
-    return 0;
 }
 
 int comparePaths(traceroute *t1, traceroute *t2)
@@ -337,135 +305,157 @@ int comparePaths(traceroute *t1, traceroute *t2)
     return -1;
 }
 
-int readTracerouteFromFile(char *filename, traceroute *t, long offset)
-{
-    FILE *f;
+// int ptFileToTraceroute(char *filename)
+//{
+// FILE *f;
+// traceroute *t = calloc(1, sizeof(traceroute));
 
-    if ((f = fopen(filename, "r")) == NULL)
-    {
-        fprintf(stderr, "Error opening file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
+// if ((f = fopen(filename, "r")) == NULL)
+//{
+// fprintf(stderr, "Error opening file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
+// exit(EXIT_FAILURE);
+//}
 
-    /* Seek to offset within file.
-    The offset should always be a multiple of sizeof(traceroute)*/
-    assert(offset % sizeof(traceroute) == 0); // erlend - remember to remove in prod!
-    fseek(f, offset, SEEK_SET);
+///* Seek to the beginning of the file */
+// fseek(f, 0, SEEK_SET);
 
-    /* Read and display data */
-    // fread(t, sizeof(traceroute), 1, f);
-    fscanf(f, TRACEROUTE_FORMAT_IN, t->timestamp, &t->hop_count, &t->destination_asn);
-    fclose(f);
+///* Read and display data */
+// fread(t, sizeof(traceroute), 1, f);
+// fclose(f);
 
-    return 0;
-}
+// return t;
+// return 0;
+//}
 
-int readTracerouteArrayFromFile(char *filename, traceroute *tr_arr[], int arraySize)
-{
-    FILE *file;
-    if ((file = fopen(filename, "r")) == NULL)
-    {
-        perror("Error:");
-        return -1;
-    }
+// int readTracerouteFromFile(char *filename, traceroute *t, long offset)
+//{
+// FILE *f;
 
-    rewind(file);
-    traceroute *t;
-    int i = 0;
-    while (1)
-    {
-        t = calloc(1, sizeof(traceroute));
-        fscanf(file, TRACEROUTE_FORMAT_IN, t->timestamp, &t->hop_count, &t->destination_asn);
-        tr_arr[i] = t;
-        if (feof(file) || (i >= (arraySize - 1)))
-        {
-            break;
-        }
-        i++;
-    }
+// if ((f = fopen(filename, "r")) == NULL)
+//{
+// fprintf(stderr, "Error opening file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
+// exit(EXIT_FAILURE);
+//}
 
-    return 0;
-}
+///* Seek to offset within file.
+// The offset should always be a multiple of sizeof(traceroute)*/
+// assert(offset % sizeof(traceroute) == 0); // erlend - remember to remove in prod!
+// fseek(f, offset, SEEK_SET);
 
-int writeTracerouteToFile(traceroute *t, char *filename)
-{
+///* Read and display data */
+//// fread(t, sizeof(traceroute), 1, f);
+// fscanf(f, TRACEROUTE_FORMAT_IN, t->timestamp, &t->hop_count, &t->destination_asn);
+// fclose(f);
 
-    // uint16_t outgoing_tcp_port;
-    // char *timestamp;
-    // address *source_ip;
-    // uint32_t source_asn;
-    // address *destination_ip;
-    // uint32_t destination_asn;
-    // uint8_t path_id[SHA_DIGEST_LENGTH];
-    // uint8_t hop_count;
-    // hop *hops[HOP_MAX]; // maximum hop length is 35. any hops longer than that do not get included.
+// return 0;
+//}
 
-    FILE *f;
-    size_t numb_elements = 1;
-    int my_int = 42;
+// int readTracerouteArrayFromFile(char *filename, traceroute *tr_arr[], int arraySize)
+//{
+// FILE *file;
+// if ((file = fopen(filename, "r")) == NULL)
+//{
+// perror("Error:");
+// return -1;
+//}
 
-    if ((f = fopen(filename, "a+")) == NULL) // Open file for reading and appending
-    {
-        fprintf(stderr, "Error opening file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
-        return -1;
-    }
+// rewind(file);
+// traceroute *t;
+// int i = 0;
+// while (1)
+//{
+// t = calloc(1, sizeof(traceroute));
+// fscanf(file, TRACEROUTE_FORMAT_IN, t->timestamp, &t->hop_count, &t->destination_asn);
+// tr_arr[i] = t;
+// if (feof(file) || (i >= (arraySize - 1)))
+//{
+// break;
+//}
+// i++;
+//}
 
-    while (flock(fileno(f), LOCK_EX | LOCK_NB) == -1) // Exclusive lock - only 1 file may operate on it at a time
-    {
-        if (errno == EWOULDBLOCK)
-        {
-            fprintf(stderr, "Error: file is locked\n");
-        }
-        else
-        {
-            // Error
-            perror("Error ");
-        }
-    }
+// return 0;
+//}
 
-    /* Write to file */
-    // fwrite(&t, sizeof(traceroute), 1, f);
-    fprintf(f, TRACEROUTE_FORMAT_OUT, t->timestamp, t->hop_count, t->destination_asn);
+// int writeTracerouteToFile(traceroute *t, char *filename)
+//{
 
-    flock(fileno(f), LOCK_UN); // unlock file
-    fclose(f);
-}
+//// uint16_t outgoing_tcp_port;
+//// char *timestamp;
+//// address *source_ip;
+//// uint32_t source_asn;
+//// address *destination_ip;
+//// uint32_t destination_asn;
+//// uint8_t path_id[SHA_DIGEST_LENGTH];
+//// uint8_t hop_count;
+//// hop *hops[HOP_MAX]; // maximum hop length is 35. any hops longer than that do not get included.
 
-int writeTracerouteArrayToFile(char *filename, traceroute *tr_arr[], int arraySize)
-{
-    FILE *f;
-    size_t numb_elements = 1;
-    int my_int = 42;
+// FILE *f;
+// size_t numb_elements = 1;
+// int my_int = 42;
 
-    if ((f = fopen(filename, "a+")) == NULL) // Open file for reading and appending
-    {
-        fprintf(stderr, "Error opening file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
-        return -1;
-    }
+// if ((f = fopen(filename, "a+")) == NULL) // Open file for reading and appending
+//{
+// fprintf(stderr, "Error opening file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
+// return -1;
+//}
 
-    while (flock(fileno(f), LOCK_EX | LOCK_NB) == -1) // Exclusive lock - only 1 file may operate on it at a time
-    {
-        if (errno == EWOULDBLOCK)
-        {
-            fprintf(stderr, "Error: file is locked\n");
-        }
-        else
-        {
-            // Error
-            perror("Error ");
-        }
-    }
+// while (flock(fileno(f), LOCK_EX | LOCK_NB) == -1) // Exclusive lock - only 1 file may operate on it at a time
+//{
+// if (errno == EWOULDBLOCK)
+//{
+// fprintf(stderr, "Error: file is locked\n");
+//}
+// else
+//{
+//// Error
+// perror("Error ");
+//}
+//}
 
-    // fwrite(&t, sizeof(traceroute), 1, f);
-    /* Write to file */
-    for (int i = 0; i < arraySize; i++)
-    {
-        fprintf(filename, TRACEROUTE_FORMAT_OUT, tr_arr[i]->timestamp, tr_arr[i]->hop_count, tr_arr[i]->destination_asn);
-    }
+///* Write to file */
+//// fwrite(&t, sizeof(traceroute), 1, f);
+// fprintf(f, TRACEROUTE_FORMAT_OUT, t->timestamp, t->hop_count, t->destination_asn);
 
-    flock(fileno(f), LOCK_UN); // unlock file
-    fclose(f);
-}
+// flock(fileno(f), LOCK_UN); // unlock file
+// fclose(f);
+//}
+
+// int writeTracerouteArrayToFile(char *filename, traceroute *tr_arr[], int arraySize)
+//{
+// FILE *f;
+// size_t numb_elements = 1;
+// int my_int = 42;
+
+// if ((f = fopen(filename, "a+")) == NULL) // Open file for reading and appending
+//{
+// fprintf(stderr, "Error opening file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
+// return -1;
+//}
+
+// while (flock(fileno(f), LOCK_EX | LOCK_NB) == -1) // Exclusive lock - only 1 file may operate on it at a time
+//{
+// if (errno == EWOULDBLOCK)
+//{
+// fprintf(stderr, "Error: file is locked\n");
+//}
+// else
+//{
+//// Error
+// perror("Error ");
+//}
+//}
+
+//// fwrite(&t, sizeof(traceroute), 1, f);
+///* Write to file */
+// for (int i = 0; i < arraySize; i++)
+//{
+// fprintf(filename, TRACEROUTE_FORMAT_OUT, tr_arr[i]->timestamp, tr_arr[i]->hop_count, tr_arr[i]->destination_asn);
+//}
+
+// flock(fileno(f), LOCK_UN); // unlock file
+// fclose(f);
+//}
 
 char **fCompareIndexedPaths(char *file1, char *file2)
 {
