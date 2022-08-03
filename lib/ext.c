@@ -410,14 +410,21 @@ int writeTracerouteToFile(traceroute *t, char *filename)
         return -1;
     }
 
-    if (flock(fileno(f), LOCK_EX) == -1) // exclusive lock - only 1 file may operate on it at a time
+    while (flock(fileno(f), LOCK_EX | LOCK_NB) == -1) // Exclusive lock - only 1 file may operate on it at a time
     {
-        fprintf(stderr, "Error locking file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
-        return -1;
+        if (errno == EWOULDBLOCK)
+        {
+            fprintf(stderr, "Error: file is locked\n");
+        }
+        else
+        {
+            // Error
+            perror("Error ");
+        }
     }
 
-    // fwrite(&t, sizeof(traceroute), 1, f);
     /* Write to file */
+    // fwrite(&t, sizeof(traceroute), 1, f);
     fprintf(f, TRACEROUTE_FORMAT_OUT, t->timestamp, t->hop_count, t->destination_asn);
 
     flock(fileno(f), LOCK_UN); // unlock file
@@ -436,10 +443,17 @@ int writeTracerouteArrayToFile(char *filename, traceroute *tr_arr[], int arraySi
         return -1;
     }
 
-    if (flock(fileno(f), LOCK_EX) == -1) // exclusive lock - only 1 file may operate on it at a time
+    while (flock(fileno(f), LOCK_EX | LOCK_NB) == -1) // Exclusive lock - only 1 file may operate on it at a time
     {
-        fprintf(stderr, "Error locking file:\t%s\nErrno:\t%s\n", filename, strerror(errno));
-        return -1;
+        if (errno == EWOULDBLOCK)
+        {
+            fprintf(stderr, "Error: file is locked\n");
+        }
+        else
+        {
+            // Error
+            perror("Error ");
+        }
     }
 
     // fwrite(&t, sizeof(traceroute), 1, f);
@@ -526,20 +540,24 @@ int serialize_bytes(char *fileName, traceroute *t)
         return -1;
     }
 
-    // First check if file is already locked, if it is locked perform busy waiting
-    // until it is unlocked
-
-    // File is not locked, continue to the next step
-    if (flock(fileno(file), LOCK_EX) == -1) // exclusive lock - only 1 process may operate on it at a time
+    /* Busy-waiting while file is locked */
+    while (flock(fileno(file), LOCK_EX | LOCK_NB) == -1)
     {
-        fprintf(stderr, "Error locking file:\t%s\nErrno:\t%s\n", fileName, strerror(errno));
-        return -1;
+        if (errno == EWOULDBLOCK)
+        {
+            fprintf(stderr, "Error: file is locked\n");
+        }
+        else
+        {
+            // error
+            perror("Error ");
+        }
     }
 
     /* Write to file */
     fwrite(t, sizeof(traceroute), 1, file);
 
-    flock(fileno(f), LOCK_UN); // unlock file
+    flock(fileno(fileName), LOCK_UN); // unlock file
     fclose(file);
     return 0;
 }
