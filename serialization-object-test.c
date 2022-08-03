@@ -292,7 +292,7 @@ int main(void)
 
 #ifdef FREAD_TEST
     char *filename = "waffles.dat";
-    int arraySize = 3;
+    int arraySize = 1000000;
     // traceroute tr_arr[arraySize];
     // traceroute tr_arr_IN[arraySize];
     traceroute *tr_arr = malloc(sizeof(traceroute) * arraySize);
@@ -315,8 +315,8 @@ int main(void)
     for (int i = 0; i < arraySize; i++)
     {
         deserialize_bytes(filename, (tr_arr + i), sizeof(traceroute) * i);
-        printTraceroute((tr_arr + i));
     }
+    printTraceroute((tr_arr + arraySize - 1));
     puts("Deserialization done!");
 
     free(tr_arr);
