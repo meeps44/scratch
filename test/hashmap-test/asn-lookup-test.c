@@ -1,6 +1,11 @@
+#include <netdb.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
+#include <errno.h>
 #include "hashmap.h"
 #include "ext.h"
 
@@ -14,6 +19,21 @@ typedef struct prefix_pair
     int asn;
     routeviews_prefix ap;
 } prefix_pair;
+
+void addressToString()
+{
+    struct sockaddr_storage addr;
+    socklen_t addr_len = sizeof(addr);
+    struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *)&addr;
+
+    // For both IPv4 and IPv6 the address passed in must be in network byte order (most significant byte first).
+    char buffer[INET6_ADDRSTRLEN];
+    const char *result = inet_ntop(AF_INET6, &ipv6addr, buffer, sizeof(buffer));
+    if (result == 0)
+    {
+        die("failed to convert address to string (errno=%d)", errno);
+    }
+}
 
 /**
  * @brief
@@ -30,7 +50,7 @@ int getASN(char *longestMatchingPrefix, struct hashmap *h)
 }
 
 /**
- * @brief Get the Longest Matching Prefix object
+ * @brief Get the Longest Matching Network Prefix
  *
  * @param a
  * @return char*
