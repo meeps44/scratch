@@ -20,19 +20,22 @@ typedef struct prefix_pair
     routeviews_prefix ap;
 } prefix_pair;
 
-void addressToString()
+char *addressToString(struct in6_addr ipv6addr)
 {
-    struct sockaddr_storage addr;
-    socklen_t addr_len = sizeof(addr);
-    struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *)&addr;
+    // struct sockaddr_storage addr;
+    // socklen_t addr_len = sizeof(addr);
+    // struct sockaddr_in6 *addr6 = (struct sockaddr_in6 *)&addr;
+    // struct in6_addr ipv6addr = addr6->sin6_addr;
 
     // For both IPv4 and IPv6 the address passed in must be in network byte order (most significant byte first).
     char buffer[INET6_ADDRSTRLEN];
     const char *result = inet_ntop(AF_INET6, &ipv6addr, buffer, sizeof(buffer));
     if (result == 0)
     {
-        die("failed to convert address to string (errno=%d)", errno);
+        printf(stderr, "failed to convert address to string (errno=%d)", errno);
+        return NULL;
     }
+    return buffer;
 }
 
 /**
