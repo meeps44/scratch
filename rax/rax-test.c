@@ -61,6 +61,7 @@ int readRouteviews(char *filename, rax *rt)
         case 2:
             strcpy(asnBuffer, line);
             asnBuffer[strcspn(asnBuffer, "\n")] = 0;
+            raxInsert(rt, (unsigned char *)delimBuffer, bufferSize, (void *)asnBuffer, NULL);
             break;
         default:
             fprintf(stderr, "Switch error\n");
