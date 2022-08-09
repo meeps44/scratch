@@ -78,7 +78,7 @@ int readRouteviews(char *filename, rax *rt)
 int main(void)
 {
     rax *rt = raxNew();
-    char *filename = "routeviews-rv6-20220411-1200.pfx2as.txt";
+    char *filename = "routeviews-rv6-20220411-1200.pfx2as.data";
     readRouteviews(filename, rt);
 
     return EXIT_SUCCESS;
