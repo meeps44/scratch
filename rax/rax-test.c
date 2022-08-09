@@ -22,7 +22,7 @@ int readRouteviews(char *filename, rax *rt)
     char *delimBuffer[100];
 
     uint8_t prefixBuffer[bufferSize];
-    uint8_t prefixlengthBuffer[2];
+    uint8_t prefixLenBuffer[bufferSize];
     uint8_t asnBuffer[bufferSize];
 
     if ((f = fopen(filename, "r")) == NULL)
@@ -36,17 +36,40 @@ int readRouteviews(char *filename, rax *rt)
     // sprintf(prefixBuffer, "")
     //}
 
-    for (int i = 0; i < 9; i++)
-    {
-        getdelim(&line, &bufferSize, 9, f);
-        printf("%s\n", line);
-    }
-    // while ((getdelim(delimBuffer, &bufferSize, 32, f)) != -1)
+    // for (int i = 0; i < 9; i++)
     //{
-    // printf("Retrieved line of length %zu:\n", nread);
-    // printf("Delim:\t%s\n", delimBuffer);
-    //// raxInsert(rt, (unsigned char *)delimBuffer, bufferSize, (void *)asnBuffer, NULL);
+    // getdelim(&line, &bufferSize, 9, f);
+    // printf("%s\n", line);
     //}
+
+    int i = 0;
+    while ((getdelim(&line, &bufferSize, 32, f)) != -1)
+    {
+        if (i % 3 == 0)
+        {
+            printf("%s\n%s\n%s\n", prefixBuffer, prefixLenBuffer, asnBuffer);
+            i = 0;
+        }
+        switch (i)
+        {
+        case 0:
+            strcpy(prefixBuffer, line);
+            break;
+        case 1:
+            strcpy(prefixLenBuffer, line);
+            break;
+        case 2:
+            strcpy(asnBuffer, line);
+            asnBuffer[strcspn(asnBuffer, "\n")] = 0;
+            break;
+        default:
+            fprintf(stderr, "Switch error\n");
+            return -1;
+        }
+        // printf("%s\n", line);
+        i++;
+        // raxInsert(rt, (unsigned char *)delimBuffer, bufferSize, (void *)asnBuffer, NULL);
+    }
 
     return 0;
 }
