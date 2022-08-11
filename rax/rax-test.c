@@ -18,6 +18,84 @@
 // return asn;
 //}
 
+void *getValue(rax *rt, unsigned char *key, size_t keyLength)
+{
+    printf("Search key: %s\n", key);
+    void *data = raxFind(rt, key, keyLength);
+    if (data == raxNotFound)
+    {
+        // fprintf(stderr, "DEBUG: Key lookup error: Key not found\n");
+        return raxNotFound;
+    }
+    printf("DEBUG: Lookup successful!\nKey:\t%.*s\nValue:\t%s\n", (int)keyLength, key, (char *)data);
+    // printf("DEBUG: Data pointer is %p\n", data);
+    // printf("DEBUG: Data value at key %s is %s\n", key, (char *) data);
+
+    return data;
+
+    // data = raxFind(rt,buffer2,bufferLength);
+    // if (data == raxNotFound) return 1;
+    // printf("Key value is %p\n", data);
+    // printf("Key value is %s\n", (char *) data);
+
+    // data = raxFind(rt,buffer3,bufferLength);
+    // if (data == raxNotFound) return 1;
+    // printf("Key value is %p\n", data);
+    // printf("Key value is %s\n", (char *) data);
+}
+
+// int search(rax *rt, unsigned char *element, size_t elementLength)
+//{
+//// Initialize iterator
+// raxIterator iter;
+// raxStart(&iter, rt);
+
+//// raxSeek(&iter,">=",(unsigned char*)"cut",3);
+// raxSeek(&iter, "<=", element, elementLength); // <= seek the element equal, or immediately smaller than the given one.
+
+// while (raxNext(&iter))
+//{
+// printf("Key: %.*s\n", (int)iter.key_len, (char *)iter.key);
+// if (raxCompare(&iter, ">", (unsigned char *)"cutiie", 6))
+// break;
+//}
+
+// raxStop(&iter);
+
+// return 0;
+//}
+
+void *search(rax *rt, unsigned char *element, size_t elementLength)
+{
+    raxIterator iter;
+    raxStart(&iter, rt); // Note that 'rt' is the radix tree pointer.
+
+    fprintf(stderr, "DEBUG: Starting raxSeek\n");
+    // raxSeek(&iter, "<=", element, elementLength);
+    raxSeek(&iter, ">=", element, elementLength);
+    fprintf(stderr, "DEBUG: Key: %.*s\n", (int)iter.key_len, (char *)iter.key);
+
+    fprintf(stderr, "DEBUG: Starting raxFind\n");
+    void *data = raxFind(rt, element, elementLength);
+
+    // if (data == raxNotFound)
+    //{
+    // fprintf(stderr, "DEBUG: Element not found. Retrying...\n");
+    // raxPrev(&iter);
+    // data = raxFind(rt, iter.key, iter.key_len);
+    //}
+
+    while (data == raxNotFound)
+    {
+        raxPrev(&iter);
+        printf("Key: %.*s\n", (int)iter.key_len, (char *)iter.key);
+        data = raxFind(rt, iter.key, iter.key_len);
+    }
+    printf("DEBUG: Lookup successful!\nKey:\t%.*s\nValue:\t%s\n", (int)elementLength, element, (char *)data);
+
+    return data;
+}
+
 int readRouteviews(char *filename, rax *rt)
 {
     FILE *f;
@@ -88,13 +166,24 @@ int readRouteviews(char *filename, rax *rt)
     return 0;
 }
 
-int search(rax *rt, char *search_string)
-{
-    raxIterator iter;
-    raxStart(&iter, rt); // Note that 'rt' is the radix tree pointer.
-    int result = raxSeek(&iter, ">=", (unsigned char *)search_string, strlen(search_string));
-    return result;
-}
+// int search(rax *rt, char *search_string)
+//{
+// raxIterator iter;
+// raxStart(&iter, rt); // Note that 'rt' is the radix tree pointer.
+// int result;
+// int searchlen = strlen(search_string);
+// while (result != 1)
+//{
+// if (searchlen < 1)
+//{
+// fprintf(stderr, "Search string not found in radix tree\n");
+// break;
+//}
+// result = raxSeek(&iter, ">=", (unsigned char *)search_string, searchlen);
+// searchlen--;
+//}
+// return result;
+//}
 
 int main(void)
 {
@@ -102,8 +191,25 @@ int main(void)
     // char *filename = "routeviews-rv6-20220411-1200.pfx2as.data";
     char *filename = "output.data";
     readRouteviews(filename, rt);
-    char *search_string = "2001:200:c000::";
-    printf("Search result:\t%d\n", search(rt, search_string));
+    // unsigned char *search_string = "2001:200:c000::";
+    unsigned char search_string[15];
+    search_string[0] = '2';
+    search_string[1] = '0';
+    search_string[2] = '0';
+    search_string[3] = '1';
+    search_string[4] = ':';
+    search_string[5] = '2';
+    search_string[6] = '0';
+    search_string[7] = '0';
+    search_string[8] = ':';
+    search_string[9] = 'c';
+    search_string[10] = '0';
+    search_string[11] = '0';
+    search_string[12] = '1';
+    search_string[13] = ':';
+    search_string[14] = ':';
+    int r = *(int *)search(rt, search_string, 15);
+    printf("Search result:\t%d\n", r);
 
     return EXIT_SUCCESS;
 }
