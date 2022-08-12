@@ -1,3 +1,5 @@
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -70,13 +72,16 @@ void *search(rax *rt, unsigned char *element, size_t elementLength)
     raxIterator iter;
     raxStart(&iter, rt); // Note that 'rt' is the radix tree pointer.
 
-    fprintf(stderr, "DEBUG: Starting raxSeek\n");
+    fprintf(stderr, "DEBUG: Starting raxSeek for element %s\n", element);
     // raxSeek(&iter, "<=", element, elementLength);
-    raxSeek(&iter, ">=", element, elementLength);
-    fprintf(stderr, "DEBUG: Key: %.*s\n", (int)iter.key_len, (char *)iter.key);
+    raxSeek(&iter, "==", element, elementLength);
+    // fprintf(stderr, "DEBUG: Key: %.*s\n", (int)iter.key_len, (char *)iter.key);
+    fprintf(stderr, "DEBUG: Iter key: %s\n", (char *)iter.key);
 
     fprintf(stderr, "DEBUG: Starting raxFind\n");
-    void *data = raxFind(rt, element, elementLength);
+    void *data = raxFind(rt, (char *)iter.key, iter.key_len);
+    fprintf(stderr, "DEBUG: raxFind done. Result data:\t%s\n", (char *)data);
+    // void *data = raxFind(rt, element, elementLength);
 
     // if (data == raxNotFound)
     //{
@@ -85,12 +90,12 @@ void *search(rax *rt, unsigned char *element, size_t elementLength)
     // data = raxFind(rt, iter.key, iter.key_len);
     //}
 
-    while (data == raxNotFound)
-    {
-        raxPrev(&iter);
-        printf("Key: %.*s\n", (int)iter.key_len, (char *)iter.key);
-        data = raxFind(rt, iter.key, iter.key_len);
-    }
+    // while (data == raxNotFound)
+    //{
+    // raxPrev(&iter);
+    // printf("Key: %.*s\n", (int)iter.key_len, (char *)iter.key);
+    // data = raxFind(rt, iter.key, iter.key_len);
+    //}
     printf("DEBUG: Lookup successful!\nKey:\t%.*s\nValue:\t%s\n", (int)elementLength, element, (char *)data);
 
     return data;
@@ -138,18 +143,20 @@ int readRouteviews(char *filename, rax *rt)
         {
         case 0:
             // printf("Case:%d\tLine:%s\n", i, line);
-            strcpy(prefixBuffer, line);
-            prefixBuffer[strlen(line)] = '\0';
-            printf("Prefixbuffer:\t%s\n", prefixBuffer);
+            // strcpy(prefixBuffer, line);
+            memcpy(prefixBuffer, line, strlen(line));
+            // prefixBuffer[strlen(line)] = '\0';
+            // printf("Prefixbuffer:\t%s\n", prefixBuffer);
             break;
         case 1:
-            strcpy(prefixLenBuffer, line);
-            prefixBuffer[strlen(line)] = '\0';
+            // strcpy(prefixLenBuffer, line);
+            memcpy(prefixLenBuffer, line, strlen(line));
+            // prefixBuffer[strlen(line)] = '\0';
             break;
         case 2:
-            strcpy(asnBuffer, line);
-            prefixBuffer[strlen(line)] = '\0';
-            // asnBuffer[strcspn(asnBuffer, "\n")] = 0; // Strip newline
+            // strcpy(asnBuffer, line);
+            memcpy(asnBuffer, line, strlen(line));
+            // prefixBuffer[strlen(line)] = '\0';
             raxInsert(rt, (unsigned char *)prefixBuffer, bufferSize, (void *)asnBuffer, NULL);
             break;
         default:
@@ -162,6 +169,8 @@ int readRouteviews(char *filename, rax *rt)
     }
 
     fclose(f);
+
+    raxShow(rt);
 
     return 0;
 }
@@ -185,31 +194,110 @@ int readRouteviews(char *filename, rax *rt)
 // return result;
 //}
 
+char *prefixedIntToBinary(int a[4], int networkPrefix, int asn, rax *rt)
+{
+    char *binaryRepresentation = malloc(sizeof(char) * networkPrefix);
+    int k = 0;
+    unsigned i;
+    for (int j = 0; j < 4; j++)
+    {
+        for (i = 1 << 31; i > 0; i = i / 2)
+        {
+            if (a[j] & i)
+            {
+                binaryRepresentation[k] = '1';
+                printf("1");
+            }
+            else
+            {
+                binaryRepresentation[k] = '0';
+                printf("0");
+            }
+            k++;
+        }
+        puts("");
+    }
+
+    // Insert binary representation of address into radix Trie
+    raxInsert(rt, (unsigned char *)binaryRepresentation, networkPrefix, (void *)&asn, NULL);
+    return binaryRepresentation;
+}
+
+char *intToBinary(int a[4])
+{
+    char *binaryRepresentation = malloc(sizeof(char) * 128);
+    int k = 0;
+    unsigned i;
+    for (int j = 0; j < 4; j++)
+    {
+        for (i = 1 << 31; i > 0; i = i / 2)
+        {
+            if (a[j] & i)
+            {
+                binaryRepresentation[k] = '1';
+                printf("1");
+            }
+            else
+            {
+                binaryRepresentation[k] = '0';
+                printf("0");
+            }
+            k++;
+        }
+        puts("");
+    }
+
+    return binaryRepresentation;
+}
+
 int main(void)
 {
     rax *rt = raxNew();
     // char *filename = "routeviews-rv6-20220411-1200.pfx2as.data";
-    char *filename = "output.data";
-    readRouteviews(filename, rt);
-    // unsigned char *search_string = "2001:200:c000::";
-    unsigned char search_string[15];
-    search_string[0] = '2';
-    search_string[1] = '0';
-    search_string[2] = '0';
-    search_string[3] = '1';
-    search_string[4] = ':';
-    search_string[5] = '2';
-    search_string[6] = '0';
-    search_string[7] = '0';
-    search_string[8] = ':';
-    search_string[9] = 'c';
-    search_string[10] = '0';
-    search_string[11] = '0';
-    search_string[12] = '1';
-    search_string[13] = ':';
-    search_string[14] = ':';
-    int r = *(int *)search(rt, search_string, 15);
-    printf("Search result:\t%d\n", r);
+    // char *filename = "output.data";
+    // readRouteviews(filename, rt);
+    //// unsigned char *search_string = "2001:200:c000::";
+    // unsigned char search_string[15];
+    // search_string[0] = '2';
+    // search_string[1] = '0';
+    // search_string[2] = '0';
+    // search_string[3] = '1';
+    // search_string[4] = ':';
+    // search_string[5] = '2';
+    // search_string[6] = '0';
+    // search_string[7] = '0';
+    // search_string[8] = ':';
+    // search_string[9] = 'c';
+    // search_string[10] = '0';
+    // search_string[11] = '0';
+    // search_string[12] = '0';
+    // search_string[13] = ':';
+    // search_string[14] = ':';
+    // int r = *(int *)search(rt, search_string, 15);
+    // printf("Search result:\t%d\n", r);
 
+    unsigned char *example_address = "2001:200:c000::";
+    struct in6_addr a;
+
+    // Here I had to convert from NSString to c string
+    inet_pton(AF_INET6, example_address, &(a));
+
+    // This line gets the integer value
+    int c1 = a.__in6_u.__u6_addr32[0];
+    int c2 = a.__in6_u.__u6_addr32[1];
+    int c3 = a.__in6_u.__u6_addr32[2];
+    int c4 = a.__in6_u.__u6_addr32[3];
+    printf("Integer rep of IPv6-address:\n%d\n%d\n%d\n%d\n", c1, c2, c3, c4);
+
+    char *char_array = intToBinary(a.__in6_u.__u6_addr32);
+    for (int i = 0; i < 128; i++)
+    {
+        if (i % 32 == 0)
+            puts("");
+        printf("%c", char_array[i]);
+    }
+    puts("");
+
+    // raxInsert(rt, (unsigned char *)prefixBuffer, bufferSize, (void *)asnBuffer, NULL);
     return EXIT_SUCCESS;
 }
