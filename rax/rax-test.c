@@ -114,6 +114,8 @@ int readRouteviews(char *filename, rax *rt)
     uint8_t prefixLenBuffer[bufferSize];
     uint8_t asnBuffer[bufferSize];
 
+    struct in6_addr a;
+
     if ((f = fopen(filename, "r")) == NULL)
     {
         perror("Error ");
@@ -151,13 +153,15 @@ int readRouteviews(char *filename, rax *rt)
         case 1:
             // strcpy(prefixLenBuffer, line);
             memcpy(prefixLenBuffer, line, strlen(line));
-            // prefixBuffer[strlen(line)] = '\0';
+            prefixLenBuffer[strlen(line)] = '\0';
             break;
         case 2:
             // strcpy(asnBuffer, line);
             memcpy(asnBuffer, line, strlen(line));
-            // prefixBuffer[strlen(line)] = '\0';
-            raxInsert(rt, (unsigned char *)prefixBuffer, bufferSize, (void *)asnBuffer, NULL);
+            asnBuffer[strlen(line)] = '\0';
+            inet_pton(AF_INET6, prefixBuffer, &(a));
+            char *result = prefixedIntToBinary(a.__in6_u.__u6_addr32, atoi(prefixLenBuffer), atoi(asnBuffer), rt);
+            // raxInsert(rt, (unsigned char *)prefixBuffer, bufferSize, (void *)asnBuffer, NULL);
             break;
         default:
             fprintf(stderr, "Switch error\n");
@@ -197,6 +201,7 @@ int readRouteviews(char *filename, rax *rt)
 char *prefixedIntToBinary(int a[4], int networkPrefix, int asn, rax *rt)
 {
     char *binaryRepresentation = malloc(sizeof(char) * networkPrefix);
+    char *tmp = malloc(sizeof(char) * 128);
     int k = 0;
     unsigned i;
     for (int j = 0; j < 4; j++)
@@ -205,12 +210,12 @@ char *prefixedIntToBinary(int a[4], int networkPrefix, int asn, rax *rt)
         {
             if (a[j] & i)
             {
-                binaryRepresentation[k] = '1';
+                tmp[k] = '1';
                 printf("1");
             }
             else
             {
-                binaryRepresentation[k] = '0';
+                tmp[k] = '0';
                 printf("0");
             }
             k++;
@@ -218,8 +223,10 @@ char *prefixedIntToBinary(int a[4], int networkPrefix, int asn, rax *rt)
         puts("");
     }
 
+    memcpy(binaryRepresentation, tmp, networkPrefix);
+
     // Insert binary representation of address into radix Trie
-    raxInsert(rt, (unsigned char *)binaryRepresentation, networkPrefix, (void *)&asn, NULL);
+    // raxInsert(rt, (unsigned char *)binaryRepresentation, networkPrefix, (void *)&asn, NULL);
     return binaryRepresentation;
 }
 
@@ -277,6 +284,8 @@ int main(void)
     // printf("Search result:\t%d\n", r);
 
     unsigned char *example_address = "2001:200:c000::";
+    unsigned char *example_network = "2001:200:e000::";
+    int example_prefix = 35;
     struct in6_addr a;
 
     // Here I had to convert from NSString to c string
