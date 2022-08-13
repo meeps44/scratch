@@ -2,6 +2,7 @@
 #define EXT_H
 #include <stdint.h>
 #include <openssl/sha.h> // SHA1
+#include <netinet/in.h>  //in6_addr
 
 #define HOP_MAX 35
 
@@ -135,9 +136,9 @@ int getFlowLabel(address *a);
  *
  * @param fileName The file to read from.
  * @param t Pointer to the destination traceroute object.
- * @param offset Offset within the file. Must be a multiple of 
+ * @param offset Offset within the file. Must be a multiple of
  * sizeof(traceroute).
- * 
+ *
  * @return int 1 if successful, 0 if error.
  */
 int readTracerouteFromFile(char *filename, traceroute *t, long offset);
@@ -319,5 +320,44 @@ int writeTracerouteArrayToFile(char *filename, traceroute *tr_arr[], int arraySi
  * @return int
  */
 int readTracerouteArrayFromFile(char *filename, traceroute *tr_arr[], int arraySize);
+
+/**
+ * @brief Serializes a traceroute object and writes it to file in CSV-format.
+ *
+ * @param fileName
+ * @param t
+ * @return int
+ */
+int serialize_csv(char *fileName, traceroute *t);
+
+/**
+ * @brief Deserializes a traceroute-object in CSV-format from file.
+ *
+ * @param fileName
+ * @param t
+ * @param offset
+ * @return int
+ */
+int deserialize_csv(char *fileName, traceroute *t, long offset);
+
+/**
+ * @brief Serializes a traceroute object and writes it to file as a
+ * raw sequence of bytes.
+ *
+ * @param fileName
+ * @param t
+ * @return int
+ */
+int serialize_bytes(char *fileName, traceroute *t);
+
+/**
+ * @brief Deserializes a traceroute object from a raw sequence of bytes.
+ *
+ * @param fileName
+ * @param t
+ * @param offset
+ * @return int
+ */
+int deserialize_bytes(char *fileName, traceroute *t, long offset);
 
 #endif

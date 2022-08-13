@@ -521,6 +521,53 @@ char **fComparePaths(char *file1, char *file2)
     return 0;
 }
 
+int serialize_csv(char *fileName, traceroute *t)
+{
+    FILE *file;
+    if ((file = fopen(fileName, "a+")) == 0)
+    {
+        fprintf(stderr, "Error opening file:\t%s\nErrno:\t%s\n", fileName, strerror(errno));
+        return -1;
+    }
+
+    /* Busy-waiting while file is locked */
+    while (flock(fileno(file), LOCK_EX | LOCK_NB) == -1)
+    {
+        if (errno == EWOULDBLOCK)
+        {
+            fprintf(stderr, "Error: file is locked\n");
+        }
+        else
+        {
+            // error
+            perror("Error ");
+        }
+    }
+
+    /* Write to file */
+    fwrite(t, sizeof(traceroute), 1, file);
+
+    flock(fileno(fileName), LOCK_UN); // unlock file
+    fclose(file);
+    return 0;
+}
+
+int deserialize_csv(char *fileName, traceroute *t, long offset)
+{
+    FILE *file;
+    if ((file = fopen(fileName, "r")) == 0)
+    {
+        perror("Error ");
+        return 1;
+    }
+
+    fseek(file, offset, SEEK_SET);
+    fread(t, sizeof(traceroute), 1, file);
+
+    fclose(file);
+    return 0;
+}
+
 int serialize_bytes(char *fileName, traceroute *t)
 {
     FILE *file;
