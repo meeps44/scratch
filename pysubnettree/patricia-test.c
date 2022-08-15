@@ -1,17 +1,10 @@
-#include "patricia.h"
-#include <stdbool.h>
-#include <memory.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <errno.h>
+#include "patricia-test.h"
 
-typedef union _inx_addr
-{
-    struct in_addr sin;
-    struct in6_addr sin6;
-} inx_addr;
+// typedef union _inx_addr
+//{
+// struct in_addr sin;
+// struct in6_addr sin6;
+//} inx_addr;
 
 patricia_tree_t *tree;
 bool binary_lookup_mode;
