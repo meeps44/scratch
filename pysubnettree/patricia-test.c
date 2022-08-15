@@ -1,6 +1,8 @@
 #include "patricia-test.h"
 #include <stdio.h>
 
+// gcc patricia.c patricia-test.c -o test.out
+
 // typedef union _inx_addr
 //{
 // struct in_addr sin;
@@ -145,6 +147,7 @@ int insert(int family, inx_addr subnet, unsigned short mask, int data)
         data = 0;
 
     node->data = (void *)&data;
+    printf("Insert: Node data:\t%d\n", *(int *)node->data);
 
     return 1;
 }
@@ -175,6 +178,8 @@ int lookup_addr(int family, inx_addr addr)
     if (!node)
         return 0;
 
+    printf("Node bitlen:\t%d\n", node->prefix->bitlen);
+    printf("Node data:\t%d\n", *(int *)node->data);
     int data = *(int *)node->data;
 
     return data;
@@ -234,6 +239,8 @@ int main(void)
     inet_pton(AF_INET6, example_address2, &bar);
     int lookup_result = lookup_addr(AF_INET6, (inx_addr)bar);
     printf("Lookup result (returned ASN):\t%d\n", lookup_result);
+
+    printf("Num active nodes:\t%d\n", tree->num_active_node);
 
     return 0;
 }
