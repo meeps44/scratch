@@ -1,4 +1,5 @@
 #include "patricia-test.h"
+#include <stdio.h>
 
 // typedef union _inx_addr
 //{
@@ -143,44 +144,9 @@ int insert(int family, inx_addr subnet, unsigned short mask, int data)
     if (!data)
         data = 0;
 
-    node->data = data;
+    node->data = (void *)&data;
 
     return 1;
-}
-
-int lookup_cidr(const char *cidr, int size)
-{
-    int family;
-    inx_addr subnet;
-    unsigned short mask;
-
-    if (binary_lookup_mode)
-    {
-        if (size == 4)
-            family = AF_INET;
-
-        else if (size == 16)
-            family = AF_INET6;
-
-        else
-        {
-            perror("Invalid binary address.  Binary addresses are 4 or 16 bytes.");
-            return 0;
-        }
-
-        memcpy(&subnet, cidr, size);
-        return lookup_addr(family, subnet);
-    }
-
-    else
-    {
-        if (!parse_cidr(cidr, &family, &subnet, &mask))
-        {
-            return 0;
-        }
-
-        return lookup_addr(family, subnet);
-    }
 }
 
 int lookup_addr(int family, inx_addr addr)
@@ -209,7 +175,7 @@ int lookup_addr(int family, inx_addr addr)
     if (!node)
         return 0;
 
-    int data = node->data;
+    int data = *(int *)node->data;
 
     return data;
 }
@@ -222,4 +188,52 @@ bool get_binary_lookup_mode()
 void set_binary_lookup_mode(bool arg_binary_lookup_mode)
 {
     binary_lookup_mode = arg_binary_lookup_mode;
+}
+
+int main(void)
+{
+    init(false);
+
+    struct in6_addr *my_addr1 = calloc(1, sizeof(struct in6_addr));
+    unsigned char *example_address = "2001:200:c000::";
+    inet_pton(AF_INET6, example_address, my_addr1);
+    unsigned short my_mask = 35;
+    int my_asn = 23634;
+    insert(AF_INET6, (inx_addr)*my_addr1, my_mask, my_asn);
+
+    struct in6_addr *my_addr2 = calloc(1, sizeof(struct in6_addr));
+    example_address = "1900:5:2:2::5170";
+    inet_pton(AF_INET6, example_address, my_addr2);
+    my_mask = 126;
+    my_asn = 3356;
+    insert(AF_INET6, (inx_addr)*my_addr2, my_mask, my_asn);
+
+    struct in6_addr *my_addr3 = calloc(1, sizeof(struct in6_addr));
+    example_address = "1900:2100::2a2c";
+    inet_pton(AF_INET6, example_address, my_addr3);
+    my_mask = 126;
+    my_asn = 3357;
+    insert(AF_INET6, (inx_addr)*my_addr3, my_mask, my_asn);
+
+    struct in6_addr *my_addr4 = calloc(1, sizeof(struct in6_addr));
+    example_address = "2001::";
+    inet_pton(AF_INET6, example_address, my_addr4);
+    my_mask = 32;
+    my_asn = 6939;
+    insert(AF_INET6, (inx_addr)*my_addr4, my_mask, my_asn);
+
+    // struct in6_addr *my_addr5 = calloc(1, sizeof(struct in6_addr));
+    // example_address = "2001:200:e00::";
+    // inet_pton(AF_INET6, example_address, my_addr5);
+    // my_mask = 40;
+    // my_asn = 4690;
+    // insert(AF_INET6, (inx_addr)*my_addr5, my_mask, my_asn);
+
+    struct in6_addr bar;
+    unsigned char *example_address2 = "1900:2100::2a2c";
+    inet_pton(AF_INET6, example_address2, &bar);
+    int lookup_result = lookup_addr(AF_INET6, (inx_addr)bar);
+    printf("Lookup result (returned ASN):\t%d\n", lookup_result);
+
+    return 0;
 }
