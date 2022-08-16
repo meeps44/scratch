@@ -135,6 +135,7 @@ int insert(int family, inx_addr subnet, unsigned short mask, int data)
     }
 
     patricia_node_t *node = patricia_lookup(tree, sn);
+    fprintf(stderr, "Got new node, addr: %p\n", node);
     Deref_Prefix(sn);
 
     if (!node)
@@ -143,10 +144,13 @@ int insert(int family, inx_addr subnet, unsigned short mask, int data)
         return 0;
     }
 
-    if (!data)
-        data = 0;
+    // if (!data)
+    // data = NULL;
 
-    node->data = (void *)&data;
+    // node->data = (void *)&data;
+    node->data = calloc(1, sizeof(int));
+    memcpy(node->data, &data, sizeof(int));
+    printf("Insert: Node addr:\t%p\n", node->data);
     printf("Insert: Node data:\t%d\n", *(int *)node->data);
 
     return 1;
@@ -235,7 +239,7 @@ int main(void)
     // insert(AF_INET6, (inx_addr)*my_addr5, my_mask, my_asn);
 
     struct in6_addr bar;
-    unsigned char *example_address2 = "1900:2100::2a2c";
+    unsigned char *example_address2 = "1900:2100::2a2d";
     inet_pton(AF_INET6, example_address2, &bar);
     int lookup_result = lookup_addr(AF_INET6, (inx_addr)bar);
     printf("Lookup result (returned ASN):\t%d\n", lookup_result);
