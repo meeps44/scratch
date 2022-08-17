@@ -544,8 +544,25 @@ int serialize_csv(char *fileName, traceroute *t)
         }
     }
 
+    // /* Write to file */
+    // fwrite(t, sizeof(traceroute), 1, file);
+    static const char *HOP_FORMAT_OUT = "%d, %d, %d:%d ";
+    static const char *TR_TEST_FORMAT_OUT = "%d, %s, %d:%d, %d, %d:%d, %d, %s, %d, ";
     /* Write to file */
-    fwrite(t, sizeof(traceroute), 1, file);
+    fprintf(file, TR_TEST_FORMAT_OUT, t->outgoing_tcp_port, t->timestamp, t->source_ip.high_order_bits, t->source_ip.low_order_bits,
+            t->source_asn, t->destination_ip.high_order_bits, t->destination_ip.low_order_bits, t->destination_asn,
+            t->path_id, t->hop_count);
+    for (int i = 0; i < 35; i++)
+    {
+        fprintf(file, HOP_FORMAT_OUT, t->hops[i].returned_flowlabel, t->hops[i].hopnumber, t->hops[i].hop_address.high_order_bits, t->hops[i].hop_address.low_order_bits);
+    }
+    /* TODO:
+    for (int i = t->hop_count; i < 35; i++)
+    {
+        fprintf(file, HOP_FORMAT_OUT, 0, 0, 0, 0);
+    }
+    */
+    fprintf(file, "\n");
 
     flock(fileno(fileName), LOCK_UN); // unlock file
     fclose(file);
@@ -562,7 +579,10 @@ int deserialize_csv(char *fileName, traceroute *t, long offset)
     }
 
     fseek(file, offset, SEEK_SET);
-    fread(t, sizeof(traceroute), 1, file);
+    // fread(t, sizeof(traceroute), 1, file);
+    static const char *TR_TEST_FORMAT_IN = "\n%d, %[^,], %d:%d, %d, %d:%d, %d, %[^,], %d";
+    static const char *HOP_FORMAT_IN = " %d, %d, %d:%d";
+    fscanf(file, TR_TEST_FORMAT_IN);
 
     fclose(file);
     return 0;
