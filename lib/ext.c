@@ -79,7 +79,7 @@ void printHash(uint8_t *digest)
     {
         printf("%02x", digest[i]);
     }
-    printf("\n");
+    puts("");
 }
 
 uint8_t *hashPath(address arr[], int arraySize)
@@ -325,6 +325,19 @@ int deserialize_csv(char *fileName, traceroute *t, long offset)
     static const char *TR_TEST_FORMAT_IN = "\n%d, %[^,], %d:%d, %d, %d:%d, %d, %[^,], %d";
     static const char *HOP_FORMAT_IN = " %d, %d, %d:%d";
     fscanf(file, TR_TEST_FORMAT_IN);
+
+    // scanf returns EOF (which is -1) on end of file
+    while (fscanf(file, TR_TEST_FORMAT_IN,
+                  t->outgoing_tcp_port,
+                  t->timestamp,
+                  t->source_ip,
+                  t->source_asn,
+                  t->destination_ip,
+                  t->destination_asn,
+                  t->path_id,
+                  t->hop_count) != EOF)
+    {
+    }
 
     fclose(file);
     return 0;

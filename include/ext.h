@@ -15,7 +15,8 @@ typedef struct hop
 {
     uint32_t returned_flowlabel;
     uint8_t hopnumber;
-    address *hop_address; // Could be a list of address pointers
+    // address *hop_address; // Could be a list of address pointers
+    struct in6_addr *hop_address;
 } hop;
 
 typedef struct traceroute
