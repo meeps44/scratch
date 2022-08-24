@@ -109,7 +109,7 @@ inline static bool parse_cidr(const char *cidr, int *family, inx_addr *subnet, u
     return true;
 }
 
-void init(bool arg_binary_lookup_mode)
+void patricia_init(bool arg_binary_lookup_mode)
 {
     tree = New_Patricia(128);
     binary_lookup_mode = arg_binary_lookup_mode;
@@ -201,7 +201,7 @@ void set_binary_lookup_mode(bool arg_binary_lookup_mode)
 
 int main(void)
 {
-    init(false);
+    patricia_init(false);
 
     struct in6_addr *my_addr1 = calloc(1, sizeof(struct in6_addr));
     unsigned char *example_address = "2001:200:c000::";
